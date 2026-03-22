@@ -348,16 +348,61 @@ p  { color: var(--gray); }
 
 .hero-note {
   position: absolute;
-  right: 8%;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: clamp(8rem, 18vw, 16rem);
-  opacity: 0.04;
   font-family: var(--font-display);
   color: var(--white);
   user-select: none;
   pointer-events: none;
   line-height: 1;
+}
+
+/* Large background note — right center */
+.hero-note--1 {
+  right: 8%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(8rem, 18vw, 16rem);
+  opacity: 0.05;
+}
+
+/* Small note — top right */
+.hero-note--2 {
+  right: 22%;
+  top: 14%;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  opacity: 0.12;
+  transform: rotate(-15deg);
+}
+
+/* Medium note — bottom right */
+.hero-note--3 {
+  right: 5%;
+  bottom: 18%;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  opacity: 0.09;
+  transform: rotate(10deg);
+}
+
+/* Tiny note — far left mid */
+.hero-note--4 {
+  left: 3%;
+  top: 38%;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  opacity: 0.07;
+  transform: rotate(-8deg);
+}
+
+/* Small note — top left area */
+.hero-note--5 {
+  left: 8%;
+  top: 20%;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  opacity: 0.08;
+  transform: rotate(12deg);
+}
+
+@media (max-width: 640px) {
+  .hero-note--4,
+  .hero-note--5 { display: none; }
 }
 
 .hero-content {
