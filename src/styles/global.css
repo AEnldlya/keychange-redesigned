@@ -1,0 +1,120 @@
+/* Pull in existing stylesheets */
+@import '../../modern.css';
+@import '../../style.css';
+
+/* ── Body override: dark text is default, sections override where needed ── */
+body { color: var(--dark, #0d1a3a); }
+
+/* ── Password Gate ── */
+.pw-gate {
+  min-height: 100vh;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: var(--font);
+}
+
+.pw-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 24px 64px rgba(13, 31, 92, 0.4);
+}
+
+@keyframes pwShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-10px); }
+  40%       { transform: translateX(10px); }
+  60%       { transform: translateX(-7px); }
+  80%       { transform: translateX(7px); }
+}
+
+.pw-card--shake {
+  animation: pwShake 0.55s var(--ease-out);
+}
+
+.pw-logo {
+  height: 56px;
+  width: auto;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.pw-sub {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
+}
+
+.pw-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pw-input {
+  width: 100%;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 1rem;
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.1em;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.pw-input::placeholder { color: rgba(255, 255, 255, 0.35); letter-spacing: 0.02em; }
+.pw-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.2); }
+.pw-input--error { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
+
+.pw-error {
+  font-size: 0.8rem;
+  color: #ff8a8a;
+  margin: 0;
+}
+
+.pw-btn {
+  width: 100%;
+  padding: 14px 32px;
+  background: var(--gold);
+  color: #1a1a1a;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(245, 197, 24, 0.35);
+}
+
+.pw-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245, 197, 24, 0.5); }
+.pw-btn:active { transform: translateY(0); }
+
+/* ── Page wrapper: push content below fixed nav on inner pages ── */
+.page-hero,
+.donate-hero,
+.get-involved-hero,
+.contact-page-section {
+  margin-top: var(--nav-h);
+}
+
+/* ── Subtle scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--blue); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
