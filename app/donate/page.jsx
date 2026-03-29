@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import AutocompleteInput from '../../components/AutocompleteInput'
 import FormSuccess from '../../components/FormSuccess'
+import ScrollChevron from '../../components/ScrollChevron'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -62,17 +63,19 @@ export default function Donate() {
 
   return (
     <>
-      <section className="donate-hero">
-        <h1>Donate to Key Change!</h1>
-        <p className="subtitle">Donate your working instruments and/or music supplies</p>
-        <p>
-          All contributions help turn unused instruments into opportunities for students who would
-          never get the chance to play. Without the support of donors like you, this project would
-          not be possible.
-        </p>
-        <a href="#donate-form" className="m-btn m-btn--light" style={{ marginTop: 16 }}>
-          DONATE FORM
-        </a>
+      <section className="page-hero">
+        <ScrollChevron />
+        <div className="container">
+          <h1>Donate to Key Change</h1>
+          <p>
+            Donate your working instruments and music supplies. All contributions help turn unused
+            instruments into opportunities for students who would never get the chance to play.
+            Without the support of donors like you, this project would not be possible.
+          </p>
+          <a href="#donate-form" className="m-btn m-btn--gold" style={{ marginTop: 16 }}>
+            Donation Form
+          </a>
+        </div>
       </section>
 
       <section className="donate-form-section" id="donate-form">

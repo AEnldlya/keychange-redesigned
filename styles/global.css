@@ -106,8 +106,21 @@ body { color: var(--white); }
 .pw-btn:active { transform: translateY(0); }
 
 
-/* ── Form readability on blue background ── */
-/* All forms live inside .donate-form-section (blue bg). Override dark defaults to white. */
+/* ── Form card — gold border on blue bg ── */
+.donate-form-wrap {
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid var(--gold);
+  border-radius: 24px;
+  padding: 44px 40px;
+  box-shadow:
+    0 0 0 1px rgba(245, 197, 24, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 64px rgba(13, 31, 92, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Labels and helper text */
 .donate-form-section .form-field label,
 .donate-form-section .form-field > p,
 .donate-form-section .checkbox-field span,
@@ -115,10 +128,12 @@ body { color: var(--white); }
   color: rgba(255, 255, 255, 0.9);
 }
 
-.donate-form-section .form-field label .req {
+.donate-form-section .form-field label .req,
+.donate-form-section .req {
   opacity: 0.55;
 }
 
+/* Inputs */
 .donate-form-section input[type="text"],
 .donate-form-section input[type="email"],
 .donate-form-section input[type="tel"],
@@ -142,13 +157,13 @@ body { color: var(--white); }
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.18);
 }
 
-/* date input calendar icon color on dark bg */
+/* Date picker icon */
 .donate-form-section input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1) opacity(0.6);
   cursor: pointer;
 }
 
-/* select dropdown arrow — white version, no-repeat to prevent tiling */
+/* Select arrow — white */
 .donate-form-section select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -156,7 +171,6 @@ body { color: var(--white); }
 }
 
 .donate-form-section .checkbox-field input[type="checkbox"] {
-  border-color: rgba(255, 255, 255, 0.4);
   accent-color: var(--gold);
 }
 
@@ -285,7 +299,39 @@ body { color: var(--white); }
 body > *:not(.nav):first-of-type { padding-top: 0; }
 /* Higher specificity (0,2,2) restores correct top clearance for inner pages */
 body > section.page-hero:first-of-type { padding-top: calc(var(--nav-h) + 8px); }
-body > section.donate-form-section:first-of-type { padding-top: calc(var(--nav-h) + 60px); }
+
+/* ── Scroll chevron (shared across all sections) ── */
+section { position: relative; }
+.scroll-chevron {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  animation: chevron-pulse 2.4s ease-in-out infinite;
+  z-index: 10;
+}
+.scroll-chevron--hero {
+  bottom: 32px;
+  color: rgba(255, 220, 80, 0.6);
+}
+@keyframes chevron-pulse {
+  0%, 100% { opacity: 0.35; transform: translateX(-50%) translateY(0); }
+  50%       { opacity: 1;    transform: translateX(-50%) translateY(5px);
+              filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45)); }
+}
+.scroll-chevron--hero {
+  animation: chevron-pulse-gold 2.4s ease-in-out infinite;
+}
+@keyframes chevron-pulse-gold {
+  0%, 100% { opacity: 0.45; transform: translateX(-50%) translateY(0); }
+  50%       { opacity: 1;    transform: translateX(-50%) translateY(5px);
+              filter: drop-shadow(0 0 8px rgba(255, 210, 50, 0.7)); }
+}
 
 /* ── Nav sizing ── */
 :root { --nav-h: 68px; }

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import FormSuccess from '../../components/FormSuccess'
+import ScrollChevron from '../../components/ScrollChevron'
 
 export default function Contact() {
   const [status, setStatus] = useState('idle')
@@ -32,6 +33,7 @@ export default function Contact() {
   return (
     <>
       <section className="page-hero">
+        <ScrollChevron />
         <div className="container">
           <h1>Contact Us</h1>
           <p>

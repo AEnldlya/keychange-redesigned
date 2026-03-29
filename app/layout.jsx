@@ -5,7 +5,10 @@ import PasswordGate from '../components/PasswordGate'
 import ScrollToTop from '../components/ScrollToTop'
 
 export const metadata = {
-  title: 'Key Change',
+  title: {
+    default: 'Key Change',
+    template: '%s | Key Change',
+  },
   description: 'Making music accessible to all students.',
 }
 

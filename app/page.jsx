@@ -3,6 +3,7 @@ import { useEffect, useRef, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useReveal } from '../hooks/useReveal'
 import FormSuccess from '../components/FormSuccess'
+import ScrollChevron from '../components/ScrollChevron'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -77,9 +78,7 @@ function HeroSection() {
           <Link href="/donate" className="m-btn m-btn--outline">Donate</Link>
         </div>
       </div>
-      <div className="m-hero__scroll-hint" aria-hidden="true">
-        <div className="m-hero__scroll-line" />
-      </div>
+      <ScrollChevron className="scroll-chevron--hero" />
     </section>
   )
 }
@@ -121,6 +120,7 @@ function StatSection() {
           Due to the high costs of music equipment, schools&apos; music programs suffer from budget cuts and outdated supplies.
         </p>
       </div>
+      <ScrollChevron />
     </section>
   )
 }
@@ -159,6 +159,7 @@ function StorySection() {
         </p>
         <Link href="/about" className="m-btn m-btn--light">LEARN MORE</Link>
       </div>
+      <ScrollChevron />
     </section>
   )
 }
@@ -214,6 +215,7 @@ function SocialSection() {
           SOCIAL
         </a>
       </div>
+      <ScrollChevron />
     </section>
   )
 }

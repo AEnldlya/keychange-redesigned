@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import AutocompleteInput from '../../components/AutocompleteInput'
 import FormSuccess from '../../components/FormSuccess'
+import ScrollChevron from '../../components/ScrollChevron'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -43,6 +44,7 @@ export default function GetInvolved() {
   return (
     <>
       <section className="page-hero">
+        <ScrollChevron />
         <div className="container">
           <h1>Get Involved</h1>
           <p>

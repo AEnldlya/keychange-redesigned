@@ -1,5 +1,6 @@
 'use client'
 import { useReveal } from '../../hooks/useReveal'
+import ScrollChevron from '../../components/ScrollChevron'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
@@ -8,7 +9,8 @@ export default function About() {
   return (
     <>
       <section className="page-hero">
-        <div className="container">
+        <ScrollChevron />
+<div className="container">
           <h1>About Key Change</h1>
           <p>
             <span className="mission-label">The Key Change Project</span> a student-led music access
