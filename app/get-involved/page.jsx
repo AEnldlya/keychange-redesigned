@@ -13,7 +13,7 @@ const ROLES = [
   { icon: '📦', title: 'Collection & Outreach', desc: 'Help us collect instruments from donors in the community through drives and outreach events.' },
   { icon: '📱', title: 'Social Media & Marketing', desc: 'Grow our online presence by creating content and managing our social media channels.' },
   { icon: '🏫', title: 'School Outreach', desc: 'Connect with schools and organizations to identify students and programs that need instruments.' },
-  { icon: '🎉', title: 'Event Support', desc: 'Help plan and run fundraising events, collection drives, and community gatherings.' },
+  { icon: 'Star', title: 'Event Support', desc: 'Help plan and run fundraising events, collection drives, and community gatherings.' },
   { icon: '🔧', title: 'Instrument Maintenance', desc: 'Inspect, clean, and perform basic repairs on donated instruments to get them ready for students.' },
   { icon: '🚚', title: 'Pickup & Delivery', desc: 'Help transport instruments between donors, our workspace, and recipient schools.' },
 ]

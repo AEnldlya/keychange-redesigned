@@ -162,7 +162,7 @@ export default function Donate() {
           <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Donation Process</h2>
           <div className="kc-how__grid kc-stagger">
             {[
-              { icon: '📝', title: 'Submit Form', desc: 'Fill out the donation form with details about your instrument.' },
+              { icon: 'FileText', title: 'Submit Form', desc: 'Fill out the donation form with details about your instrument.' },
               { icon: '👀', title: 'We Review', desc: 'Our team reviews your submission within 3 business days.' },
               { icon: '📅', title: 'Schedule', desc: 'We coordinate a convenient time for pickup or dropoff.' },
               { icon: '🏠', title: 'New Home', desc: 'Your instrument finds a student who will love it.' },
