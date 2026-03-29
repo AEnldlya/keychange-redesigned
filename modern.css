@@ -5,8 +5,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --blue:       #2d6bf5;
-  --blue-dark:  #1a4fd8;
+  --blue:       #2560e8;
+  --blue-dark:  #1848cc;
   --blue-deep:  #0d1f5c;
   --gold:       #f5c518;
   --gold-dark:  #d4a800;
@@ -78,7 +78,7 @@ ul { list-style: none; }
 .m-nav__links a {
   font-size: 0.92rem;
   font-weight: 400;
-  color: var(--dark);
+  color: rgba(255, 255, 255, 0.88);
   transition: color 0.2s, opacity 0.2s;
   position: relative;
 }
@@ -94,7 +94,7 @@ ul { list-style: none; }
   transition: transform 0.25s var(--ease-out);
 }
 
-.m-nav__links a:hover { color: #000; }
+.m-nav__links a:hover { color: var(--white); }
 .m-nav__links a:hover::after { transform: scaleX(1); }
 
 .m-nav__icon-link { display: flex; align-items: center; }
@@ -424,7 +424,7 @@ ul { list-style: none; }
 
 .m-stat__body {
   font-size: 0.95rem;
-  color: var(--dark, #0d1a3a);
+  color: rgba(220, 232, 255, 0.82);
   font-weight: 600;
   line-height: 1.7;
   max-width: 500px;
@@ -496,7 +496,7 @@ ul { list-style: none; }
 
 .m-story__intro {
   font-size: 0.95rem;
-  color: #0d1a3a;
+  color: rgba(255, 255, 255, 0.92);
   line-height: 1.75;
   margin-bottom: 18px;
   text-decoration: underline;
@@ -506,7 +506,7 @@ ul { list-style: none; }
 
 .m-story__body {
   font-size: 0.92rem;
-  color: rgba(13,26,58,0.72);
+  color: rgba(220, 232, 255, 0.72);
   line-height: 1.75;
   margin-bottom: 16px;
 }
@@ -628,7 +628,7 @@ ul { list-style: none; }
 .m-social__heading {
   font-size: clamp(1.6rem, 3vw, 2.5rem);
   font-weight: 300;
-  color: #1a1a2e;
+  color: rgba(255, 255, 255, 0.90);
   letter-spacing: -0.01em;
 }
 
@@ -736,7 +736,7 @@ ul { list-style: none; }
 
 .m-contact__sub {
   font-size: 0.95rem;
-  color: rgba(13,26,58,0.7);
+  color: rgba(220, 232, 255, 0.78);
   line-height: 1.8;
 }
 

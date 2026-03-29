@@ -2,8 +2,8 @@
 @import '../modern.css';
 @import '../style.css';
 
-/* ── Body override: dark text is default, sections override where needed ── */
-body { color: var(--dark, #0d1a3a); }
+/* ── Body: white text default on blue backgrounds ── */
+body { color: var(--white); }
 
 /* ── Password Gate ── */
 .pw-gate {
@@ -105,13 +105,6 @@ body { color: var(--dark, #0d1a3a); }
 .pw-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245, 197, 24, 0.5); }
 .pw-btn:active { transform: translateY(0); }
 
-/* ── Page wrapper: push content below fixed nav on inner pages ── */
-.page-hero,
-.donate-hero,
-.get-involved-hero,
-.contact-page-section {
-  margin-top: var(--nav-h);
-}
 
 /* ── Form readability on blue background ── */
 /* All forms live inside .donate-form-section (blue bg). Override dark defaults to white. */
@@ -285,10 +278,19 @@ body { color: var(--dark, #0d1a3a); }
 .fs--quiet .fs__title { font-size: 1.2rem; color: rgba(255,255,255,0.95); }
 .fs--quiet .fs__msg   { color: rgba(255,255,255,0.55); }
 
-/* ── Compact nav ── */
-:root { --nav-h: 52px; }
-.m-nav__logo-img { height: 30px; }
-.m-nav__inner { padding: 0 28px; }
+/* ── Nav offset fix for Next.js layout ──
+   style.css targets body > *:not(.nav):first-of-type (specificity 0,2,1).
+   In Next.js, <nav class="m-nav"> and <section class="page-hero"> are both
+   direct body children and both match. Zero all, then restore for page sections. */
+body > *:not(.nav):first-of-type { padding-top: 0; }
+/* Higher specificity (0,2,2) restores correct top clearance for inner pages */
+body > section.page-hero:first-of-type { padding-top: calc(var(--nav-h) + 8px); }
+body > section.donate-form-section:first-of-type { padding-top: calc(var(--nav-h) + 60px); }
+
+/* ── Nav sizing ── */
+:root { --nav-h: 68px; }
+.m-nav__logo-img { height: 52px; }
+.m-nav__inner { padding: 0 32px; }
 .m-nav__links { gap: 26px; }
 
 /* ── Subtle scrollbar ── */
