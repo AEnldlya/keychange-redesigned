@@ -1,4 +1,5 @@
-import { useReveal } from '../hooks/useReveal'
+'use client'
+import { useReveal } from '../../hooks/useReveal'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })

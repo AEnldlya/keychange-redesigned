@@ -1,15 +1,17 @@
+'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function Nav() {
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const lastScrollY = useRef(0)
-  const location = useLocation()
+  const pathname = usePathname()
 
   // Close mobile menu on route change
-  useEffect(() => { setMenuOpen(false) }, [location])
+  useEffect(() => { setMenuOpen(false) }, [pathname])
 
   // Hide/show nav on scroll direction
   useEffect(() => {
@@ -43,14 +45,14 @@ export default function Nav() {
   return (
     <nav className={`m-nav${hidden ? ' hidden' : ''}${scrolled ? ' scrolled' : ''}`}>
       <div className="m-nav__inner">
-        <Link to="/" className="m-nav__logo">
+        <Link href="/" className="m-nav__logo">
           <img src="/assets/logo.svg" alt="Key Change" className="m-nav__logo-img" />
         </Link>
         <ul className="m-nav__links">
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/get-involved">Get Involved</Link></li>
-          <li><Link to="/donate">Donate</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
+          <li><Link href="/about">About</Link></li>
+          <li><Link href="/get-involved">Get Involved</Link></li>
+          <li><Link href="/donate">Donate</Link></li>
+          <li><Link href="/contact">Contact</Link></li>
           <li>
             <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener" aria-label="Instagram" className="m-nav__icon-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -79,10 +81,10 @@ export default function Nav() {
         </button>
       </div>
       <div className={`m-nav__mobile${menuOpen ? ' open' : ''}`}>
-        <Link to="/about">About</Link>
-        <Link to="/get-involved">Get Involved</Link>
-        <Link to="/donate">Donate</Link>
-        <Link to="/contact">Contact</Link>
+        <Link href="/about">About</Link>
+        <Link href="/get-involved">Get Involved</Link>
+        <Link href="/donate">Donate</Link>
+        <Link href="/contact">Contact</Link>
         <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
       </div>
     </nav>

@@ -1,6 +1,8 @@
-import { useEffect, useRef, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+'use client'
+import { useEffect, useRef, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useReveal } from '../hooks/useReveal'
+import FormSuccess from '../components/FormSuccess'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -71,8 +73,8 @@ function HeroSection() {
           </span>
         </h1>
         <div className="m-hero__ctas">
-          <Link to="/get-involved" className="m-btn m-btn--gold">Get Involved</Link>
-          <Link to="/donate" className="m-btn m-btn--outline">Donate</Link>
+          <Link href="/get-involved" className="m-btn m-btn--gold">Get Involved</Link>
+          <Link href="/donate" className="m-btn m-btn--outline">Donate</Link>
         </div>
       </div>
       <div className="m-hero__scroll-hint" aria-hidden="true">
@@ -97,9 +99,8 @@ function StatSection() {
     const duration = 2500
     const start = performance.now()
     function tick(now) {
-      const p = Math.min((now - start) / duration, 1)
-      countRef.current.textContent = Math.floor(easeOutCubic(p) * target).toLocaleString()
-      if (p < 1) requestAnimationFrame(tick)
+      countRef.current.textContent = Math.floor(easeOutCubic(Math.min((now - start) / duration, 1)) * target).toLocaleString()
+      if ((now - start) / duration < 1) requestAnimationFrame(tick)
       else countRef.current.textContent = target.toLocaleString()
     }
     requestAnimationFrame(tick)
@@ -156,7 +157,7 @@ function StorySection() {
           the energy and empathy of students, Key Change aims not only to fill a resource gap but to
           spark lasting musical journeys for kids who might otherwise be left out.
         </p>
-        <Link to="/about" className="m-btn m-btn--light">LEARN MORE</Link>
+        <Link href="/about" className="m-btn m-btn--light">LEARN MORE</Link>
       </div>
     </section>
   )
@@ -221,6 +222,30 @@ function SocialSection() {
 function ContactSection() {
   const [leftRef, leftVisible] = useReveal()
   const [rightRef, rightVisible] = useReveal()
+  const [status, setStatus] = useState('idle')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setStatus('submitting')
+    const fd = new FormData(e.target)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: fd.get('first_name'),
+          last_name: fd.get('last_name'),
+          email: fd.get('email'),
+          message: fd.get('message'),
+          newsletter: false,
+          source: 'Home Page',
+        }),
+      })
+      setStatus(res.ok ? 'success' : 'error')
+    } catch {
+      setStatus('error')
+    }
+  }
 
   return (
     <section className="m-contact">
@@ -234,32 +259,40 @@ function ContactSection() {
         </div>
         <div className={`m-contact__right${rightVisible ? ' visible' : ''}`} ref={rightRef}>
           <div className="m-contact__card">
-            <form
-              action="https://formspree.io/f/REPLACE_WITH_CONTACT_FORM_ID"
-              method="POST"
-              className="m-form"
-            >
-              <input type="hidden" name="_subject" value="New message — Key Change" />
-              <div className="m-form__row">
-                <div className="m-form__field">
-                  <label className="m-form__label">First Name <span className="m-form__req">(required)</span></label>
-                  <input type="text" name="first_name" required placeholder="First" />
+            {status === 'success' ? (
+              <FormSuccess
+                variant="quiet"
+                title="Message sent!"
+                message="We'll be in touch soon."
+              />
+            ) : (
+              <form onSubmit={handleSubmit} className="m-form">
+                <div className="m-form__row">
+                  <div className="m-form__field">
+                    <label className="m-form__label">First Name <span className="m-form__req">(required)</span></label>
+                    <input type="text" name="first_name" required placeholder="First" />
+                  </div>
+                  <div className="m-form__field">
+                    <label className="m-form__label">Last Name <span className="m-form__req">(required)</span></label>
+                    <input type="text" name="last_name" required placeholder="Last" />
+                  </div>
                 </div>
                 <div className="m-form__field">
-                  <label className="m-form__label">Last Name <span className="m-form__req">(required)</span></label>
-                  <input type="text" name="last_name" required placeholder="Last" />
+                  <label className="m-form__label">Email <span className="m-form__req">(required)</span></label>
+                  <input type="email" name="email" required placeholder="your@email.com" />
                 </div>
-              </div>
-              <div className="m-form__field">
-                <label className="m-form__label">Email <span className="m-form__req">(required)</span></label>
-                <input type="email" name="email" required placeholder="your@email.com" />
-              </div>
-              <div className="m-form__field">
-                <label className="m-form__label">Message <span className="m-form__req">(required)</span></label>
-                <textarea name="message" rows="5" required placeholder="Tell us about yourself..." />
-              </div>
-              <button type="submit" className="m-btn m-btn--gold m-btn--full">SEND</button>
-            </form>
+                <div className="m-form__field">
+                  <label className="m-form__label">Message <span className="m-form__req">(required)</span></label>
+                  <textarea name="message" rows="5" required placeholder="Tell us about yourself..." />
+                </div>
+                {status === 'error' && (
+                  <p style={{ color: 'red', fontSize: '0.875rem' }}>Something went wrong. Please try again.</p>
+                )}
+                <button type="submit" className="m-btn m-btn--gold m-btn--full" disabled={status === 'submitting'}>
+                  {status === 'submitting' ? 'Sending…' : 'SEND'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
