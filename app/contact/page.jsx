@@ -2,24 +2,54 @@
 import { useState } from 'react'
 import FormSuccess from '../../components/FormSuccess'
 import ScrollChevron from '../../components/ScrollChevron'
+import FAQ from '../../components/FAQ'
+import { useReveal } from '../../hooks/useReveal'
+import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
+
+const CONTACT_FAQ = [
+  { q: 'How long does it take to get a response?', a: 'We typically respond to all messages within 48 hours. If your matter is urgent, please mention that in your message.' },
+  { q: 'How can I donate instruments?', a: 'Head over to our Donate page to fill out a donation form. We accept all types of instruments in any condition.' },
+  { q: 'Can I volunteer with Key Change?', a: 'Absolutely! Visit our Get Involved page to learn about volunteer roles and fill out an application.' },
+  { q: 'Where is Key Change based?', a: 'We are based in the Upper Valley area of New Hampshire and Vermont, primarily serving the Hanover and Norwich communities.' },
+  { q: 'Is Key Change a registered nonprofit?', a: 'We are a student-led initiative working toward official nonprofit status. Contact us for the latest information.' },
+]
 
 export default function Contact() {
   const [status, setStatus] = useState('idle')
+  const [errors, setErrors] = useState({})
+  const [infoRef, infoVisible] = useReveal({ threshold: 0.1 })
+  const [faqRef, faqVisible] = useReveal({ threshold: 0.1 })
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus('submitting')
     const fd = new FormData(e.target)
+    const data = {
+      first_name: fd.get('first_name'),
+      last_name: fd.get('last_name'),
+      email: fd.get('email'),
+      message: fd.get('message'),
+    }
+
+    const validationErrors = validateForm(data, {
+      first_name: [v => validateRequired(v, 'First name')],
+      last_name: [v => validateRequired(v, 'Last name')],
+      email: [v => validateRequired(v, 'Email'), validateEmail],
+      message: [v => validateRequired(v, 'Message')],
+    })
+    if (validationErrors) {
+      setErrors(validationErrors)
+      return
+    }
+    setErrors({})
+    setStatus('submitting')
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          first_name: fd.get('first_name'),
-          last_name: fd.get('last_name'),
-          email: fd.get('email'),
+          ...data,
           newsletter: fd.get('newsletter') === 'yes',
-          message: fd.get('message'),
           source: 'Contact Page',
         }),
       })
@@ -32,9 +62,9 @@ export default function Contact() {
 
   return (
     <>
-      <section className="page-hero">
+      <section className="kc-page-hero">
         <ScrollChevron />
-        <div className="container">
+        <div className="kc-container">
           <h1>Contact Us</h1>
           <p>
             Have a question, want to get involved, or just want to say hello? Fill out the form below
@@ -43,55 +73,97 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="donate-form-section">
-        <div className="container">
-          <div className="donate-form-wrap">
+      {/* Contact Info Cards */}
+      <section className={`kc-section kc-reveal${infoVisible ? ' visible' : ''}`} ref={infoRef} style={{ background: 'var(--color-surface)' }}>
+        <div className="kc-container" style={{ maxWidth: '800px' }}>
+          <div className="kc-contact-info kc-stagger">
+            <div className="kc-glass kc-contact-info__card" style={{ '--i': 0 }}>
+              <div className="kc-contact-info__icon">✉️</div>
+              <div className="kc-contact-info__title">Email</div>
+              <div className="kc-contact-info__value">
+                <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
+              </div>
+            </div>
+            <div className="kc-glass kc-contact-info__card" style={{ '--i': 1 }}>
+              <div className="kc-contact-info__icon">📍</div>
+              <div className="kc-contact-info__title">Location</div>
+              <div className="kc-contact-info__value">Upper Valley, NH &amp; VT</div>
+            </div>
+            <div className="kc-glass kc-contact-info__card" style={{ '--i': 2 }}>
+              <div className="kc-contact-info__icon">📷</div>
+              <div className="kc-contact-info__title">Instagram</div>
+              <div className="kc-contact-info__value">
+                <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">@keychangeproject</a>
+              </div>
+            </div>
+          </div>
+          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
+            We typically respond within 48 hours.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section className="kc-section">
+        <div className="kc-container" style={{ maxWidth: '640px' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>Send Us a Message</h2>
+          <div className="kc-glass kc-glass--gold">
             {status === 'success' ? (
               <FormSuccess
                 variant="quiet"
                 title="Message sent!"
-                message="Thanks for reaching out. We'll get back to you soon."
+                message="Thanks for reaching out. We'll get back to you within 48 hours."
               />
             ) : (
-              <form onSubmit={handleSubmit}>
-                <div className="form-field">
-                  <label>Name</label>
-                  <div className="form-row">
-                    <div>
-                      <label>First Name <span className="req">(required)</span></label>
-                      <input type="text" name="first_name" required />
-                    </div>
-                    <div>
-                      <label>Last Name <span className="req">(required)</span></label>
-                      <input type="text" name="last_name" required />
-                    </div>
+              <form onSubmit={handleSubmit} className="kc-form">
+                <div className="kc-form__row">
+                  <div className="kc-form__field">
+                    <label className="kc-form__label">First Name <span className="kc-form__req">(required)</span></label>
+                    <input type="text" name="first_name" required className={errors.first_name ? 'error' : ''} />
+                    {errors.first_name && <span className="kc-form__error">{errors.first_name}</span>}
+                  </div>
+                  <div className="kc-form__field">
+                    <label className="kc-form__label">Last Name <span className="kc-form__req">(required)</span></label>
+                    <input type="text" name="last_name" required className={errors.last_name ? 'error' : ''} />
+                    {errors.last_name && <span className="kc-form__error">{errors.last_name}</span>}
                   </div>
                 </div>
 
-                <div className="form-field">
-                  <label>Email <span className="req">(required)</span></label>
-                  <input type="email" name="email" required />
+                <div className="kc-form__field">
+                  <label className="kc-form__label">Email <span className="kc-form__req">(required)</span></label>
+                  <input type="email" name="email" required className={errors.email ? 'error' : ''} />
+                  {errors.email && <span className="kc-form__error">{errors.email}</span>}
                 </div>
 
-                <label className="checkbox-field">
+                <label className="kc-checkbox">
                   <input type="checkbox" name="newsletter" value="yes" />
                   <span>Sign up for news and updates</span>
                 </label>
 
-                <div className="form-field">
-                  <label>Message <span className="req">(required)</span></label>
-                  <textarea name="message" rows="5" required />
+                <div className="kc-form__field">
+                  <label className="kc-form__label">Message <span className="kc-form__req">(required)</span></label>
+                  <textarea name="message" rows="5" required className={errors.message ? 'error' : ''} />
+                  {errors.message && <span className="kc-form__error">{errors.message}</span>}
                 </div>
 
                 {status === 'error' && (
-                  <p style={{ color: 'red', fontSize: '0.875rem' }}>Something went wrong. Please try again.</p>
+                  <div className="kc-form__status kc-form__status--error" role="alert">
+                    Something went wrong. Please try again.
+                  </div>
                 )}
-                <button type="submit" className="m-btn m-btn--light-blue" style={{ width: '100%', color: 'var(--blue)' }} disabled={status === 'submitting'}>
-                  {status === 'submitting' ? 'Submitting…' : 'SUBMIT'}
+                <button type="submit" className="kc-btn kc-btn--gold kc-btn--full" disabled={status === 'submitting'}>
+                  {status === 'submitting' ? 'Submitting…' : 'Send Message'}
                 </button>
               </form>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className={`kc-section kc-reveal${faqVisible ? ' visible' : ''}`} ref={faqRef} style={{ background: 'var(--color-surface)' }}>
+        <div className="kc-container">
+          <FAQ title="Frequently Asked Questions" items={CONTACT_FAQ} />
         </div>
       </section>
     </>

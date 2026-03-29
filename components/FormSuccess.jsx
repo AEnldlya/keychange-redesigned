@@ -1,6 +1,5 @@
 'use client'
 
-// Notes burst outward from center at 12 different angles — only used for 'celebrate' variant
 const BURST = [
   { char: '♪', angle: 15,  dist: 95,  size: 1.4, delay: 0.00 },
   { char: '♫', angle: 45,  dist: 115, size: 1.1, delay: 0.05 },
@@ -16,10 +15,6 @@ const BURST = [
   { char: '♬', angle: 345, dist: 93,  size: 1.6, delay: 0.07 },
 ]
 
-/**
- * variant="celebrate" — donation: full note burst, gold glow, big energy
- * variant="quiet"     — contact/volunteer: single note, soft ripple, understated
- */
 export default function FormSuccess({
   title = 'Submitted!',
   message = "We'll be in touch soon.",
@@ -36,24 +31,22 @@ export default function FormSuccess({
     : []
 
   return (
-    <div className={`fs fs--${variant}`}>
-      <div className="fs__emblem">
+    <div className={`kc-fs${isCelebrate ? '' : ' kc-fs--quiet'}`} role="status" aria-live="polite">
+      <div className="kc-fs__emblem">
         {isCelebrate ? (
           <>
-            <div className="fs__ring fs__ring--1" />
-            <div className="fs__ring fs__ring--2" />
-            <div className="fs__ring fs__ring--3" />
+            <div className="kc-fs__ring kc-fs__ring--1" />
+            <div className="kc-fs__ring kc-fs__ring--2" />
+            <div className="kc-fs__ring kc-fs__ring--3" />
           </>
         ) : (
-          <div className="fs__ring fs__ring--1" />
+          <div className="kc-fs__ring kc-fs__ring--1" />
         )}
-
-        <div className="fs__icon">{isCelebrate ? '♪' : '✓'}</div>
-
+        <div className="kc-fs__icon">{isCelebrate ? '♪' : '✓'}</div>
         {notes.map((n, i) => (
           <span
             key={i}
-            className="fs__burst"
+            className="kc-fs__burst"
             style={{
               '--tx': `${n.x}px`,
               '--ty': `${n.y}px`,
@@ -65,9 +58,8 @@ export default function FormSuccess({
           </span>
         ))}
       </div>
-
-      <h3 className="fs__title">{title}</h3>
-      <p className="fs__msg">{message}</p>
+      <h3 className="kc-fs__title">{title}</h3>
+      <p className="kc-fs__msg">{message}</p>
     </div>
   )
 }

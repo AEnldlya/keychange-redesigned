@@ -1,19 +1,22 @@
 'use client'
+import Link from 'next/link'
 import { useReveal } from '../../hooks/useReveal'
 import ScrollChevron from '../../components/ScrollChevron'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
   const [textRef, textVisible] = useReveal({ threshold: 0.15 })
+  const [valuesRef, valuesVisible] = useReveal({ threshold: 0.1 })
+  const [timelineRef, timelineVisible] = useReveal({ threshold: 0.1 })
 
   return (
     <>
-      <section className="page-hero">
+      <section className="kc-page-hero">
         <ScrollChevron />
-<div className="container">
+        <div className="kc-container">
           <h1>About Key Change</h1>
           <p>
-            <span className="mission-label">The Key Change Project</span> a student-led music access
+            <strong>The Key Change Project</strong> is a student-led music access
             initiative that collects funds and instruments and returns them to our community. Our
             mission is to remove barriers to music-making by recycling, repairing, and redistributing
             instruments to students and local programs that lack resources. We run collection drives,
@@ -22,40 +25,85 @@ export default function About() {
             connecting donors, volunteers, and music educators, we create opportunities for creative
             growth, build musical skills, and strengthen community through shared access to music.
           </p>
-          <p>
-            <span className="mission-label">Mission:</span> To expand the accessibility of music
-            education and build a team of people committed to sustaining this effort.<br />
+          <p style={{ marginTop: 'var(--space-6)' }}>
+            <strong>Mission:</strong> To expand the accessibility of music
+            education and build a team of people committed to sustaining this effort.
             We aim to build community where all ambitious students get a chance with music, and a team
-            that is inspired to give unused instruments/resources for students to use.
+            that is inspired to give unused instruments and resources for students to use.
           </p>
         </div>
       </section>
 
-      <section className="m-story about-story-section" id="about-story">
-        <div className={`m-story__image-wrap${imgVisible ? ' visible' : ''}`} ref={imgRef}>
-          <img src="/assets/microphone.webp" alt="Microphone" className="m-story__img" />
+      {/* Values Section */}
+      <section className={`kc-section kc-values kc-reveal${valuesVisible ? ' visible' : ''}`} ref={valuesRef}>
+        <div className="kc-container">
+          <h2 className="kc-values__heading">Our Values</h2>
+          <div className="kc-values__grid kc-stagger">
+            {[
+              { icon: '🎵', title: 'Access for All', desc: 'Every student deserves the chance to discover music, regardless of their financial situation.' },
+              { icon: '♻️', title: 'Sustainability', desc: 'We give instruments a second life instead of letting them collect dust in closets and attics.' },
+              { icon: '🤝', title: 'Community', desc: 'We bring together donors, volunteers, educators, and students to create lasting musical impact.' },
+            ].map((val, i) => (
+              <div key={i} className="kc-glass kc-values__card" style={{ '--i': i }}>
+                <div className="kc-values__icon">{val.icon}</div>
+                <h3 className="kc-values__title">{val.title}</h3>
+                <p className="kc-values__desc">{val.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className={`m-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
-          <h2 className="m-story__heading">
-            We support schools to positively change the music availability in schools.
+      </section>
+
+      {/* Story Section */}
+      <section className="kc-story">
+        <div className={`kc-story__image-wrap${imgVisible ? ' visible' : ''}`} ref={imgRef}>
+          <img src="/assets/guitarra.webp" alt="Guitar" className="kc-story__img" />
+        </div>
+        <div className={`kc-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
+          <h2 className="kc-story__heading">
+            We support schools to positively change the music availability for students.
           </h2>
-          <p className="m-story__body">
-            Many of students all around the world who wish to participate are unable to play an
+          <p className="kc-story__body">
+            Many students all around the world who wish to participate are unable to play an
             instrument and gain music education, due to schools being unable to afford the musical
             resources needed to support their students.{' '}
             <strong>Barriers like these prevent too many students from pursuing their love for music.</strong>
           </p>
-          <p className="m-story__body">
-            Participating in musical activities offers a countless number of benefits. Musical
+          <p className="kc-story__body">
+            Participating in musical activities offers countless benefits. Musical
             education not only improves a kid&apos;s mental health but also develops their own creativity
             and self-expression. Music also develops key skills, such as teamwork, communication,
-            confidence etc. Students who participate in music actively build needed traits.
+            confidence, and more. Students who participate in music actively build needed traits.
           </p>
-          <p className="m-story__body">
+          <p className="kc-story__body">
             In many cases, students who lack musical opportunities just give up and act as if music
             wasn&apos;t for them. However, we should challenge these views, as we encourage the growing
             youth to fight back and reach their maximum potential.
           </p>
+        </div>
+      </section>
+
+      {/* How It Works Timeline */}
+      <section className={`kc-section kc-reveal${timelineVisible ? ' visible' : ''}`} ref={timelineRef} style={{ background: 'var(--color-surface)' }}>
+        <div className="kc-container">
+          <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>How It Works</h2>
+          <div className="kc-timeline kc-stagger">
+            {[
+              { title: 'Donate', desc: 'Fill out our donation form with details about your instrument. We accept all instruments in any condition.' },
+              { title: 'Inspect & Repair', desc: 'Our team inspects every donation and makes necessary repairs to ensure instruments are ready to play.' },
+              { title: 'Match', desc: 'We connect instruments with schools and students in the Upper Valley who need them most.' },
+              { title: 'Deliver', desc: 'Instruments are delivered to their new homes, and students begin their musical journey.' },
+            ].map((step, i) => (
+              <div key={i} className="kc-timeline__item" style={{ '--i': i }}>
+                <div className="kc-timeline__dot" />
+                <h3 className="kc-timeline__title">{step.title}</h3>
+                <p className="kc-timeline__desc">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-12)' }}>
+            <Link href="/donate" className="kc-btn kc-btn--gold">Donate an Instrument</Link>
+          </div>
         </div>
       </section>
     </>
