@@ -1,49 +1,30 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
 import AutocompleteInput from '../../components/AutocompleteInput'
 import FormSuccess from '../../components/FormSuccess'
 import ScrollChevron from '../../components/ScrollChevron'
-import MagneticButton from '../../components/MagneticButton'
-import RevealCard from '../../components/RevealCard'
+import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
-import {
-  TiltImage,
-  BorderGlow,
-  ParallaxImage,
-  ZoomOnScroll,
-} from '../../components/animations/ImageAnimations'
-import {
-  FloatingParticles,
-  MorphingGradient,
-  BreathingPulse,
-} from '../../components/animations/PassiveAnimations'
-import {
-  FlipCard3D,
-  FlipCounter,
-  NeonGlow,
-  TextReveal,
-  RevealOnScroll,
-  SpotlightCard,
-} from '../../components/animations/PremiumAnimations'
-import { LazyInstrumentIcon, LazyMusicNote3D } from '../../components/3d/Lazy3D'
+import FlipCounter from '../../components/animations/FlipCounter'
+import TextReveal from '../../components/animations/TextReveal'
+import MusicNote3D from '../../components/3d/MusicNote3D'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
 
 const ROLES = [
-  { num: '01', svgType: 'note', instrument: 'violin', title: 'Collection & Outreach', desc: 'Help us collect instruments from donors in the community through drives and outreach events.' },
-  { num: '02', svgType: 'wave', instrument: 'guitar', title: 'Social Media & Marketing', desc: 'Grow our online presence by creating content and managing our social media channels.' },
-  { num: '03', svgType: 'treble', instrument: 'piano', title: 'School Outreach', desc: 'Connect with schools and organizations to identify students and programs that need instruments.' },
-  { num: '04', svgType: 'note', instrument: 'trumpet', title: 'Event Support', desc: 'Help plan and run fundraising events, collection drives, and community gatherings.' },
-  { num: '05', svgType: 'wave', instrument: 'violin', title: 'Instrument Maintenance', desc: 'Inspect, clean, and perform basic repairs on donated instruments to get them ready for students.' },
-  { num: '06', svgType: 'treble', instrument: 'guitar', title: 'Pickup & Delivery', desc: 'Help transport instruments between donors, our workspace, and recipient schools.' },
+  { icon: '📦', title: 'Collection & Outreach', desc: 'Help us collect instruments from donors in the community through drives and outreach events.' },
+  { icon: '📱', title: 'Social Media & Marketing', desc: 'Grow our online presence by creating content and managing our social media channels.' },
+  { icon: '🏫', title: 'School Outreach', desc: 'Connect with schools and organizations to identify students and programs that need instruments.' },
+  { icon: '⭐', title: 'Event Support', desc: 'Help plan and run fundraising events, collection drives, and community gatherings.' },
+  { icon: '🔧', title: 'Instrument Maintenance', desc: 'Inspect, clean, and perform basic repairs on donated instruments to get them ready for students.' },
+  { icon: '🚚', title: 'Pickup & Delivery', desc: 'Help transport instruments between donors, our workspace, and recipient schools.' },
 ]
 
 export default function GetInvolved() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
+  const [rolesRef, rolesVisible] = useReveal({ threshold: 0.1 })
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -112,28 +93,23 @@ export default function GetInvolved() {
   return (
     <>
       <section className="kc-page-hero" style={{ position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.4 }}>
-          <LazyMusicNote3D noteCount={6} showGlow={false} style={{ position: 'relative', width: '100%', height: '100%' }} />
+        <MusicNote3D noteCount={6} showGlow={false} />
+        <ScrollChevron />
+        <div className="kc-container" style={{ position: 'relative', zIndex: 3 }}>
+          <TextReveal
+            text="Get Involved"
+            as="h1"
+            mode="char"
+            stagger={0.04}
+            duration={0.5}
+          />
+          <p>
+            Want to help make music accessible to more students? Whether you have an hour a week
+            or a weekend a month, there&apos;s a role for you. Explore volunteer opportunities below
+            and fill out the form to join our team.
+          </p>
         </div>
-          <ScrollChevron />
-          <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
-            <TextReveal
-              text="Get Involved"
-              as="h1"
-              mode="char"
-              stagger={0.04}
-              duration={0.5}
-              style={{ fontSize: 'var(--text-5xl)', fontFamily: 'var(--font-display)', fontWeight: 900 }}
-            />
-            <RevealOnScroll direction="up" stagger={0.1}>
-              <p>
-                Want to help make music accessible to more students? Whether you have an hour a week
-                or a weekend a month, there&apos;s a role for you. Explore volunteer opportunities below
-                and fill out the form to join our team.
-              </p>
-            </RevealOnScroll>
-          </div>
-        </section>
+      </section>
 
       {/* Impact Stats with FlipCounter */}
       <section className="kc-section" style={{ background: 'var(--color-surface)' }}>
@@ -146,117 +122,55 @@ export default function GetInvolved() {
             style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}
           />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-8)', textAlign: 'center' }}>
-            <RevealOnScroll direction="up" stagger={0}>
-              <div>
-                <FlipCounter target={50} duration={2} suffix="+" className="kc-stat__number" />
-                <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Instruments Donated</p>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll direction="up" stagger={0.1}>
-              <div>
-                <FlipCounter target={25} duration={2} suffix="+" className="kc-stat__number" />
-                <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Active Volunteers</p>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll direction="up" stagger={0.2}>
-              <div>
-                <FlipCounter target={10} duration={2} suffix="+" className="kc-stat__number" />
-                <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Schools Reached</p>
-              </div>
-            </RevealOnScroll>
+            <div>
+              <FlipCounter
+                target={50}
+                duration={2}
+                suffix="+"
+                style={{ fontSize: 'var(--text-5xl, 3rem)', fontWeight: 900, color: 'var(--color-gold)', fontFamily: 'var(--font-display)' }}
+              />
+              <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Instruments Donated</p>
+            </div>
+            <div>
+              <FlipCounter
+                target={25}
+                duration={2}
+                suffix="+"
+                style={{ fontSize: 'var(--text-5xl, 3rem)', fontWeight: 900, color: 'var(--color-gold)', fontFamily: 'var(--font-display)' }}
+              />
+              <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Active Volunteers</p>
+            </div>
+            <div>
+              <FlipCounter
+                target={10}
+                duration={2}
+                suffix="+"
+                style={{ fontSize: 'var(--text-5xl, 3rem)', fontWeight: 900, color: 'var(--color-gold)', fontFamily: 'var(--font-display)' }}
+              />
+              <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Schools Reached</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Community image band */}
-      <section className="kc-section kc-community-band" style={{ background: 'var(--color-surface)', paddingTop: 0, paddingBottom: 0 }}>
-        <div className="kc-community-band__grid">
-          <RevealCard index={0} className="kc-community-band__item">
-            <TiltImage maxTilt={5}>
-              <BorderGlow>
-                <Image
-                  src="/images/volunteer-community.jpg"
-                  alt="Community volunteers working together"
-                  width={600}
-                  height={400}
-                  quality={80}
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                />
-              </BorderGlow>
-            </TiltImage>
-          </RevealCard>
-          <RevealCard index={1} className="kc-community-band__item">
-            <TiltImage maxTilt={5}>
-              <BorderGlow>
-                <Image
-                  src="/images/volunteer-youth-group.jpg"
-                  alt="Youth group activity"
-                  width={600}
-                  height={400}
-                  quality={80}
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                />
-              </BorderGlow>
-            </TiltImage>
-          </RevealCard>
-        </div>
-      </section>
-
       {/* Volunteer Roles */}
-      <MorphingGradient
-        colors={['rgba(245,197,24,0.04)', 'rgba(37,96,232,0.03)', 'rgba(22,32,50,0.05)']}
-        duration={22}
-        style={{ background: 'var(--color-surface)' }}
-      >
-        <section className="kc-section kc-roles">
-          <div className="kc-container">
-            <TextReveal
-              text="Volunteer Roles"
-              as="h2"
-              className="kc-roles__heading"
-              mode="word"
-              stagger={0.08}
-            />
-            <div className="kc-roles__grid">
-              {ROLES.map((role, i) => (
-                <RevealOnScroll key={i} direction="up" stagger={i * 0.08}>
-                  <FlipCard3D
-                    height={280}
-                    flipOnHover
-                    front={
-                      <div className="kc-roles__card-inner">
-                        <div className="kc-roles__icon" style={{ display: 'flex', justifyContent: 'center' }}>
-                          <LazyInstrumentIcon type={role.instrument} size={72} />
-                        </div>
-                        <h3 className="kc-roles__title">{role.title}</h3>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Hover to learn more</p>
-                      </div>
-                    }
-                    back={
-                      <div className="kc-roles__card-inner">
-                        <h3 className="kc-roles__title" style={{ marginBottom: 'var(--space-4)' }}>{role.title}</h3>
-                        <p className="kc-roles__desc">{role.desc}</p>
-                      </div>
-                    }
-                  />
-                </RevealOnScroll>
-              ))}
-            </div>
-          <RevealOnScroll direction="up" stagger={0.3}>
-            <div style={{ textAlign: 'center', marginTop: 'var(--space-12)' }}>
-              <NeonGlow color="#F5C518" intensity="subtle" pulse>
-                <MagneticButton href="#volunteer-form" variant="gold">
-                  Join Our Team
-                </MagneticButton>
-              </NeonGlow>
-            </div>
-          </RevealOnScroll>
+      <section className={`kc-section kc-roles kc-reveal${rolesVisible ? ' visible' : ''}`} ref={rolesRef} style={{ background: 'var(--color-surface)' }}>
+        <div className="kc-container">
+          <TextReveal text="Volunteer Roles" as="h2" className="kc-roles__heading" mode="word" stagger={0.08} />
+          <div className="kc-roles__grid kc-stagger">
+            {ROLES.map((role, i) => (
+              <div key={i} className="kc-glass kc-roles__card" style={{ '--i': i }}>
+                <div className="kc-roles__icon">{role.icon}</div>
+                <h3 className="kc-roles__title">{role.title}</h3>
+                <p className="kc-roles__desc">{role.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-      </MorphingGradient>
 
       {/* Volunteer Form */}
-      <section className="kc-section" id="volunteer-form">
+      <section className="kc-section">
         <div className="kc-container" style={{ maxWidth: '720px' }}>
           <TextReveal
             text="Volunteer Application"

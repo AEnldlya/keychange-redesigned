@@ -6,6 +6,10 @@ import FormSuccess from '../components/FormSuccess'
 import ScrollChevron from '../components/ScrollChevron'
 import { validateEmail, validateRequired, validateForm } from '../lib/validate'
 import AuroraBackground from '../components/animations/AuroraBackground'
+import SpotlightCard from '../components/animations/SpotlightCard'
+import TextReveal from '../components/animations/TextReveal'
+import WaveEffect from '../components/animations/WaveEffect'
+import MusicNote3D from '../components/3d/MusicNote3D'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -61,6 +65,7 @@ function HeroSection() {
       </div>
       <div className="kc-hero__overlay" />
       <AuroraBackground />
+      <MusicNote3D noteCount={10} showGlow />
       <HeroNotes />
       <div className="kc-hero__content">
         <h1 className="kc-hero__headline">
@@ -140,14 +145,16 @@ function HowItWorks() {
   return (
     <section className={`kc-section kc-how kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
       <div className="kc-container">
-        <h2 className="kc-how__heading">How It Works</h2>
+        <TextReveal text="How It Works" as="h2" className="kc-how__heading" mode="word" stagger={0.06} />
         <div className="kc-how__grid kc-stagger">
           {STEPS.map((step, i) => (
-            <div key={i} className="kc-how__step" style={{ '--i': i }}>
-              <div className="kc-how__icon">{step.icon}</div>
-              <h3 className="kc-how__step-title">{step.title}</h3>
-              <p className="kc-how__step-desc">{step.desc}</p>
-            </div>
+            <SpotlightCard key={i} radius={250}>
+              <div className="kc-how__step" style={{ '--i': i }}>
+                <div className="kc-how__icon">{step.icon}</div>
+                <h3 className="kc-how__step-title">{step.title}</h3>
+                <p className="kc-how__step-desc">{step.desc}</p>
+              </div>
+            </SpotlightCard>
           ))}
         </div>
       </div>
@@ -295,7 +302,8 @@ function ContactSection() {
   }
 
   return (
-    <section className="kc-section kc-contact">
+    <section className="kc-section kc-contact" style={{ position: 'relative' }}>
+      <WaveEffect color="rgba(245,197,24,0.03)" layers={3} height={120} style={{ position: 'absolute', top: 0, left: 0, right: 0 }} />
       <div className="kc-contact__inner">
         <div className={`kc-contact__left${leftVisible ? ' visible' : ''}`} ref={leftRef}>
           <h2 className="kc-contact__heading">Contact Us</h2>

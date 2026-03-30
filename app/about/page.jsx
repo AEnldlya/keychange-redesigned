@@ -2,6 +2,8 @@
 import Link from 'next/link'
 import { useReveal } from '../../hooks/useReveal'
 import ScrollChevron from '../../components/ScrollChevron'
+import MorphingShapes from '../../components/animations/MorphingShapes'
+import TextReveal from '../../components/animations/TextReveal'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
@@ -14,7 +16,7 @@ export default function About() {
       <section className="kc-page-hero">
         <ScrollChevron />
         <div className="kc-container">
-          <h1>About Key Change</h1>
+          <TextReveal text="About Key Change" as="h1" mode="char" stagger={0.04} duration={0.5} />
           <p>
             <strong>The Key Change Project</strong> is a student-led music access
             initiative that collects funds and instruments and returns them to our community. Our
@@ -35,9 +37,21 @@ export default function About() {
       </section>
 
       {/* Values Section */}
-      <section className={`kc-section kc-values kc-reveal${valuesVisible ? ' visible' : ''}`} ref={valuesRef}>
-        <div className="kc-container">
-          <h2 className="kc-values__heading">Our Values</h2>
+      <section className={`kc-section kc-values kc-reveal${valuesVisible ? ' visible' : ''}`} ref={valuesRef} style={{ position: 'relative' }}>
+        <MorphingShapes
+          color="rgba(245,197,24,0.04)"
+          size={500}
+          duration={24}
+          style={{ position: 'absolute', top: '-80px', right: '-120px', zIndex: 0, pointerEvents: 'none', opacity: 0.6 }}
+        />
+        <MorphingShapes
+          color="rgba(37,96,232,0.03)"
+          size={400}
+          duration={28}
+          style={{ position: 'absolute', bottom: '-60px', left: '-100px', zIndex: 0, pointerEvents: 'none', opacity: 0.5 }}
+        />
+        <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
+          <TextReveal text="Our Values" as="h2" className="kc-values__heading" mode="word" stagger={0.08} />
           <div className="kc-values__grid kc-stagger">
             {[
               { icon: '🎵', title: 'Access for All', desc: 'Every student deserves the chance to discover music, regardless of their financial situation.' },
@@ -60,9 +74,13 @@ export default function About() {
           <img src="/assets/guitarra.webp" alt="Guitar" className="kc-story__img" />
         </div>
         <div className={`kc-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
-          <h2 className="kc-story__heading">
-            We support schools to positively change the music availability for students.
-          </h2>
+          <TextReveal
+            text="We support schools to positively change the music availability for students."
+            as="h2"
+            className="kc-story__heading"
+            mode="word"
+            stagger={0.04}
+          />
           <p className="kc-story__body">
             Many students all around the world who wish to participate are unable to play an
             instrument and gain music education, due to schools being unable to afford the musical

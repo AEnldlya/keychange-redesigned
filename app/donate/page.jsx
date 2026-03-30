@@ -7,6 +7,7 @@ import ScrollChevron from '../../components/ScrollChevron'
 import FAQ from '../../components/FAQ'
 import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validatePhone, validateRequired, validateFileSize, validateDate, validateForm } from '../../lib/validate'
+import SpotlightCard from '../../components/animations/SpotlightCard'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -167,11 +168,13 @@ export default function Donate() {
               { icon: '📅', title: 'Schedule', desc: 'We coordinate a convenient time for pickup or dropoff.' },
               { icon: '🏠', title: 'New Home', desc: 'Your instrument finds a student who will love it.' },
             ].map((step, i) => (
-              <div key={i} className="kc-how__step" style={{ '--i': i }}>
-                <div className="kc-how__icon">{step.icon}</div>
-                <h3 className="kc-how__step-title">{step.title}</h3>
-                <p className="kc-how__step-desc">{step.desc}</p>
-              </div>
+              <SpotlightCard key={i} radius={250}>
+                <div className="kc-how__step" style={{ '--i': i }}>
+                  <div className="kc-how__icon">{step.icon}</div>
+                  <h3 className="kc-how__step-title">{step.title}</h3>
+                  <p className="kc-how__step-desc">{step.desc}</p>
+                </div>
+              </SpotlightCard>
             ))}
           </div>
         </div>

@@ -5,6 +5,7 @@ import ScrollChevron from '../../components/ScrollChevron'
 import FAQ from '../../components/FAQ'
 import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
+import WaveEffect from '../../components/animations/WaveEffect'
 
 const CONTACT_FAQ = [
   { q: 'How long does it take to get a response?', a: 'We typically respond to all messages within 48 hours. If your matter is urgent, please mention that in your message.' },
