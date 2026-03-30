@@ -8,6 +8,10 @@ import { validateEmail, validateRequired, validateForm } from '../../lib/validat
 import FlipCounter from '../../components/animations/FlipCounter'
 import TextReveal from '../../components/animations/TextReveal'
 import MusicNote3D from '../../components/3d/MusicNote3D'
+import GlassCard from '../../components/animations/GlassCard'
+import PulseGlow from '../../components/animations/PulseGlow'
+import StaggeredList from '../../components/animations/StaggeredList'
+import FloatingParticles from '../../components/animations/FloatingParticles'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -93,6 +97,7 @@ export default function GetInvolved() {
   return (
     <>
       <section className="kc-page-hero" style={{ position: 'relative' }}>
+        <FloatingParticles count={15} color="rgba(245,197,24,0.06)" maxSize={5} />
         <MusicNote3D noteCount={6} showGlow={false} />
         <ScrollChevron />
         <div className="kc-container" style={{ position: 'relative', zIndex: 3 }}>
@@ -123,12 +128,14 @@ export default function GetInvolved() {
           />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-8)', textAlign: 'center' }}>
             <div>
-              <FlipCounter
-                target={50}
-                duration={2}
-                suffix="+"
-                style={{ fontSize: 'var(--text-5xl, 3rem)', fontWeight: 900, color: 'var(--color-gold)', fontFamily: 'var(--font-display)' }}
-              />
+              <PulseGlow color="#F5C518" size={15} duration={3} style={{ borderRadius: '50%' }}>
+                <FlipCounter
+                  target={50}
+                  duration={2}
+                  suffix="+"
+                  style={{ fontSize: 'var(--text-5xl, 3rem)', fontWeight: 900, color: 'var(--color-gold)', fontFamily: 'var(--font-display)' }}
+                />
+              </PulseGlow>
               <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Instruments Donated</p>
             </div>
             <div>
@@ -157,15 +164,17 @@ export default function GetInvolved() {
       <section className={`kc-section kc-roles kc-reveal${rolesVisible ? ' visible' : ''}`} ref={rolesRef} style={{ background: 'var(--color-surface)' }}>
         <div className="kc-container">
           <TextReveal text="Volunteer Roles" as="h2" className="kc-roles__heading" mode="word" stagger={0.08} />
-          <div className="kc-roles__grid kc-stagger">
+          <StaggeredList stagger={0.1} direction="up" distance={35} className="kc-roles__grid">
             {ROLES.map((role, i) => (
-              <div key={i} className="kc-glass kc-roles__card" style={{ '--i': i }}>
-                <div className="kc-roles__icon">{role.icon}</div>
-                <h3 className="kc-roles__title">{role.title}</h3>
-                <p className="kc-roles__desc">{role.desc}</p>
-              </div>
+              <GlassCard key={i} blur={12} opacity={0.06} hover>
+                <div className="kc-roles__card" style={{ '--i': i }}>
+                  <div className="kc-roles__icon">{role.icon}</div>
+                  <h3 className="kc-roles__title">{role.title}</h3>
+                  <p className="kc-roles__desc">{role.desc}</p>
+                </div>
+              </GlassCard>
             ))}
-          </div>
+          </StaggeredList>
         </div>
       </section>
 

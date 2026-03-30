@@ -4,6 +4,10 @@ import { useReveal } from '../../hooks/useReveal'
 import ScrollChevron from '../../components/ScrollChevron'
 import MorphingShapes from '../../components/animations/MorphingShapes'
 import TextReveal from '../../components/animations/TextReveal'
+import TiltCard from '../../components/animations/TiltCard'
+import StaggeredList from '../../components/animations/StaggeredList'
+import ParallaxImage from '../../components/animations/ParallaxImage'
+import InstrumentRotate from '../../components/3d/InstrumentRotate'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
@@ -52,26 +56,28 @@ export default function About() {
         />
         <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
           <TextReveal text="Our Values" as="h2" className="kc-values__heading" mode="word" stagger={0.08} />
-          <div className="kc-values__grid kc-stagger">
+          <StaggeredList stagger={0.12} direction="up" distance={40} className="kc-values__grid">
             {[
               { icon: '🎵', title: 'Access for All', desc: 'Every student deserves the chance to discover music, regardless of their financial situation.' },
               { icon: '♻️', title: 'Sustainability', desc: 'We give instruments a second life instead of letting them collect dust in closets and attics.' },
               { icon: '🤝', title: 'Community', desc: 'We bring together donors, volunteers, educators, and students to create lasting musical impact.' },
             ].map((val, i) => (
-              <div key={i} className="kc-glass kc-values__card" style={{ '--i': i }}>
-                <div className="kc-values__icon">{val.icon}</div>
-                <h3 className="kc-values__title">{val.title}</h3>
-                <p className="kc-values__desc">{val.desc}</p>
-              </div>
+              <TiltCard key={i} tiltMax={8} glare>
+                <div className="kc-glass kc-values__card" style={{ '--i': i }}>
+                  <div className="kc-values__icon">{val.icon}</div>
+                  <h3 className="kc-values__title">{val.title}</h3>
+                  <p className="kc-values__desc">{val.desc}</p>
+                </div>
+              </TiltCard>
             ))}
-          </div>
+          </StaggeredList>
         </div>
       </section>
 
       {/* Story Section */}
       <section className="kc-story">
         <div className={`kc-story__image-wrap${imgVisible ? ' visible' : ''}`} ref={imgRef}>
-          <img src="/assets/guitarra.webp" alt="Guitar" className="kc-story__img" />
+          <ParallaxImage src="/assets/guitarra.webp" alt="Guitar" speed={0.25} height={500} />
         </div>
         <div className={`kc-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
           <TextReveal
@@ -122,6 +128,17 @@ export default function About() {
           <div style={{ textAlign: 'center', marginTop: 'var(--space-12)' }}>
             <Link href="/donate" className="kc-btn kc-btn--gold">Donate an Instrument</Link>
           </div>
+        </div>
+      </section>
+
+      {/* 3D Instrument Showcase */}
+      <section className="kc-section" style={{ background: 'var(--color-bg)' }}>
+        <div className="kc-container" style={{ textAlign: 'center' }}>
+          <h2 style={{ marginBottom: 'var(--space-4)' }}>Every Instrument Tells a Story</h2>
+          <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-8)' }}>
+            From donated guitars to refurbished keyboards, each instrument carries the potential to change a student&apos;s life.
+          </p>
+          <InstrumentRotate speed={0.8} color="#F5C518" accentColor="#2560E8" style={{ maxWidth: 500, margin: '0 auto' }} />
         </div>
       </section>
     </>

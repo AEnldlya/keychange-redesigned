@@ -8,6 +8,9 @@ import FAQ from '../../components/FAQ'
 import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validatePhone, validateRequired, validateFileSize, validateDate, validateForm } from '../../lib/validate'
 import SpotlightCard from '../../components/animations/SpotlightCard'
+import ShimmerEffect from '../../components/animations/ShimmerEffect'
+import RevealOnScroll from '../../components/animations/RevealOnScroll'
+import HoverLift from '../../components/animations/HoverLift'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -163,18 +166,22 @@ export default function Donate() {
           <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Donation Process</h2>
           <div className="kc-how__grid kc-stagger">
             {[
-              { icon: 'FileText', title: 'Submit Form', desc: 'Fill out the donation form with details about your instrument.' },
+              { icon: '📝', title: 'Submit Form', desc: 'Fill out the donation form with details about your instrument.' },
               { icon: '👀', title: 'We Review', desc: 'Our team reviews your submission within 3 business days.' },
               { icon: '📅', title: 'Schedule', desc: 'We coordinate a convenient time for pickup or dropoff.' },
               { icon: '🏠', title: 'New Home', desc: 'Your instrument finds a student who will love it.' },
             ].map((step, i) => (
-              <SpotlightCard key={i} radius={250}>
-                <div className="kc-how__step" style={{ '--i': i }}>
-                  <div className="kc-how__icon">{step.icon}</div>
-                  <h3 className="kc-how__step-title">{step.title}</h3>
-                  <p className="kc-how__step-desc">{step.desc}</p>
-                </div>
-              </SpotlightCard>
+              <RevealOnScroll key={i} direction="up" delay={i * 0.12}>
+                <SpotlightCard radius={250}>
+                  <HoverLift lift={5}>
+                    <div className="kc-how__step" style={{ '--i': i }}>
+                      <div className="kc-how__icon">{step.icon}</div>
+                      <h3 className="kc-how__step-title">{step.title}</h3>
+                      <p className="kc-how__step-desc">{step.desc}</p>
+                    </div>
+                  </HoverLift>
+                </SpotlightCard>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
@@ -184,6 +191,13 @@ export default function Donate() {
       <section className="kc-section" id="donate-form">
         <div className="kc-container" style={{ maxWidth: '720px' }}>
           <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>Donate Music Supplies to Key Change!</h2>
+          {status === 'submitting' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 'var(--space-6)' }}>
+              <ShimmerEffect width="100%" height={16} borderRadius={8} />
+              <ShimmerEffect width="70%" height={16} borderRadius={8} />
+              <ShimmerEffect width="85%" height={16} borderRadius={8} />
+            </div>
+          )}
           <div className="kc-glass kc-glass--gold">
             {status === 'success' ? (
               <FormSuccess

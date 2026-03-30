@@ -10,6 +10,12 @@ import SpotlightCard from '../components/animations/SpotlightCard'
 import TextReveal from '../components/animations/TextReveal'
 import WaveEffect from '../components/animations/WaveEffect'
 import MusicNote3D from '../components/3d/MusicNote3D'
+import FloatingParticles from '../components/animations/FloatingParticles'
+import RevealOnScroll from '../components/animations/RevealOnScroll'
+import NeonGlow from '../components/animations/NeonGlow'
+import HoverLift from '../components/animations/HoverLift'
+import MagneticButton from '../components/animations/MagneticButton'
+import WaveReveal from '../components/animations/WaveReveal'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -65,6 +71,7 @@ function HeroSection() {
       </div>
       <div className="kc-hero__overlay" />
       <AuroraBackground />
+      <FloatingParticles count={25} color="rgba(245,197,24,0.08)" maxSize={6} />
       <MusicNote3D noteCount={10} showGlow />
       <HeroNotes />
       <div className="kc-hero__content">
@@ -82,8 +89,12 @@ function HeroSection() {
           </span>
         </h1>
         <div className="kc-hero__ctas">
-          <Link href="/get-involved" className="kc-btn kc-btn--gold">Get Involved</Link>
-          <Link href="/donate" className="kc-btn kc-btn--outline">Donate</Link>
+          <MagneticButton as="div" strength={0.3}>
+            <Link href="/get-involved" className="kc-btn kc-btn--gold">Get Involved</Link>
+          </MagneticButton>
+          <MagneticButton as="div" strength={0.3}>
+            <Link href="/donate" className="kc-btn kc-btn--outline">Donate</Link>
+          </MagneticButton>
         </div>
       </div>
       <ScrollChevron className="kc-chevron--hero" />
@@ -118,7 +129,9 @@ function StatSection() {
     <section className={`kc-section kc-stat kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
       <div className="kc-container">
         <p className="kc-stat__source">According to the 2019 Current newsletter</p>
-        <span className="kc-stat__number" ref={countRef}>0</span>
+        <NeonGlow color="#F5C518" intensity={0.6} mode="text" duration={3}>
+          <span className="kc-stat__number" ref={countRef}>0</span>
+        </NeonGlow>
         <p className="kc-stat__label">
           students across the United States do not have access to music education in public schools
         </p>
@@ -145,16 +158,20 @@ function HowItWorks() {
   return (
     <section className={`kc-section kc-how kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
       <div className="kc-container">
-        <TextReveal text="How It Works" as="h2" className="kc-how__heading" mode="word" stagger={0.06} />
+        <WaveReveal text="How It Works" as="h2" className="kc-how__heading" amplitude={15} stagger={0.04} />
         <div className="kc-how__grid kc-stagger">
           {STEPS.map((step, i) => (
-            <SpotlightCard key={i} radius={250}>
-              <div className="kc-how__step" style={{ '--i': i }}>
-                <div className="kc-how__icon">{step.icon}</div>
-                <h3 className="kc-how__step-title">{step.title}</h3>
-                <p className="kc-how__step-desc">{step.desc}</p>
-              </div>
-            </SpotlightCard>
+            <RevealOnScroll key={i} direction="up" delay={i * 0.1}>
+              <SpotlightCard radius={250}>
+                <HoverLift lift={6}>
+                  <div className="kc-how__step" style={{ '--i': i }}>
+                    <div className="kc-how__icon">{step.icon}</div>
+                    <h3 className="kc-how__step-title">{step.title}</h3>
+                    <p className="kc-how__step-desc">{step.desc}</p>
+                  </div>
+                </HoverLift>
+              </SpotlightCard>
+            </RevealOnScroll>
           ))}
         </div>
       </div>
@@ -173,7 +190,9 @@ function StorySection() {
         <img src="/assets/microphone.webp" alt="Microphone close-up" className="kc-story__img" />
       </div>
       <div className={`kc-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
-        <h2 className="kc-story__heading">Our Story</h2>
+        <RevealOnScroll direction="right" distance={30}>
+          <h2 className="kc-story__heading">Our Story</h2>
+        </RevealOnScroll>
         <p className="kc-story__intro">
           Ansh and Jason noticed a growing gap between students who could access music education
           and those who could not, and they decided to do something about it. They founded Key

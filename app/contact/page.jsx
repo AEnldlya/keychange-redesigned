@@ -6,6 +6,9 @@ import FAQ from '../../components/FAQ'
 import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
 import WaveEffect from '../../components/animations/WaveEffect'
+import GlassCard from '../../components/animations/GlassCard'
+import MagneticButton from '../../components/animations/MagneticButton'
+import NeonGlow from '../../components/animations/NeonGlow'
 
 const CONTACT_FAQ = [
   { q: 'How long does it take to get a response?', a: 'We typically respond to all messages within 48 hours. If your matter is urgent, please mention that in your message.' },
@@ -66,7 +69,7 @@ export default function Contact() {
       <section className="kc-page-hero">
         <ScrollChevron />
         <div className="kc-container">
-          <h1>Contact Us</h1>
+          <h1><NeonGlow color="#F5C518" intensity={0.4} mode="text" duration={3}>Contact Us</NeonGlow></h1>
           <p>
             Have a question, want to get involved, or just want to say hello? Fill out the form below
             and we&apos;ll get back to you as soon as we can.
@@ -78,25 +81,25 @@ export default function Contact() {
       <section className={`kc-section kc-reveal${infoVisible ? ' visible' : ''}`} ref={infoRef} style={{ background: 'var(--color-surface)' }}>
         <div className="kc-container" style={{ maxWidth: '800px' }}>
           <div className="kc-contact-info kc-stagger">
-            <div className="kc-glass kc-contact-info__card" style={{ '--i': 0 }}>
+            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 0 }}>
               <div className="kc-contact-info__icon">✉️</div>
               <div className="kc-contact-info__title">Email</div>
               <div className="kc-contact-info__value">
                 <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
               </div>
-            </div>
-            <div className="kc-glass kc-contact-info__card" style={{ '--i': 1 }}>
+            </GlassCard>
+            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 1 }}>
               <div className="kc-contact-info__icon">📍</div>
               <div className="kc-contact-info__title">Location</div>
               <div className="kc-contact-info__value">Upper Valley, NH &amp; VT</div>
-            </div>
-            <div className="kc-glass kc-contact-info__card" style={{ '--i': 2 }}>
+            </GlassCard>
+            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 2 }}>
               <div className="kc-contact-info__icon">📷</div>
               <div className="kc-contact-info__title">Instagram</div>
               <div className="kc-contact-info__value">
                 <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">@keychangeproject</a>
               </div>
-            </div>
+            </GlassCard>
           </div>
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
             We typically respond within 48 hours.
@@ -152,9 +155,11 @@ export default function Contact() {
                     Something went wrong. Please try again.
                   </div>
                 )}
-                <button type="submit" className="kc-btn kc-btn--gold kc-btn--full" disabled={status === 'submitting'}>
-                  {status === 'submitting' ? 'Submitting…' : 'Send Message'}
-                </button>
+                <MagneticButton as="div" strength={0.25}>
+                  <button type="submit" className="kc-btn kc-btn--gold kc-btn--full" disabled={status === 'submitting'}>
+                    {status === 'submitting' ? 'Submitting…' : 'Send Message'}
+                  </button>
+                </MagneticButton>
               </form>
             )}
           </div>
