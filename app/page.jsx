@@ -5,6 +5,7 @@ import { useReveal } from '../hooks/useReveal'
 import FormSuccess from '../components/FormSuccess'
 import ScrollChevron from '../components/ScrollChevron'
 import { validateEmail, validateRequired, validateForm } from '../lib/validate'
+import AuroraBackground from '../components/animations/AuroraBackground'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -59,6 +60,7 @@ function HeroSection() {
         <img src="/assets/hero.webp" alt="" aria-hidden="true" className="kc-hero__img" />
       </div>
       <div className="kc-hero__overlay" />
+      <AuroraBackground />
       <HeroNotes />
       <div className="kc-hero__content">
         <h1 className="kc-hero__headline">
