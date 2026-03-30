@@ -3,14 +3,24 @@ import { useRef, useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
 /**
- * TextReveal — Characters or words animate in when scrolled into view.
+ * TextReveal — Characters or words reveal one-by-one when scrolled into view.
+ *
+ * Features:
+ *  - IntersectionObserver triggers animation on scroll
+ *  - Character-by-character or word-by-word mode
+ *  - Smooth cubic-bezier easing (expo out)
+ *  - Accessible: preserves aria-label with full text
+ *  - No SSR issues ('use client')
+ *  - React 18 compatible
  *
  * Props:
  *  - text (string): the text to reveal
  *  - as (string): HTML tag, default 'h2'
- *  - mode ('char' | 'word'): split by character or word, default 'char'
+ *  - mode ('char' | 'word'): split mode, default 'char'
  *  - stagger (number): delay between each unit, default 0.03
- *  - duration (number): animation duration per unit, default 0.4
+ *  - duration (number): per-unit animation duration, default 0.5
+ *  - threshold (number): IntersectionObserver threshold, default 0.2
+ *  - once (boolean): animate only once, default true
  *  - className, style
  */
 export default function TextReveal({
@@ -18,7 +28,9 @@ export default function TextReveal({
   as: Tag = 'h2',
   mode = 'char',
   stagger = 0.03,
-  duration = 0.4,
+  duration = 0.5,
+  threshold = 0.2,
+  once = true,
   className = '',
   style = {},
 }) {
@@ -32,25 +44,26 @@ export default function TextReveal({
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true)
-          io.disconnect()
+          if (once) io.disconnect()
+        } else if (!once) {
+          setVisible(false)
         }
       },
-      { threshold: 0.2 }
+      { threshold }
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [threshold, once])
 
   const units = useMemo(() => {
     if (mode === 'word') {
       return text.split(' ').map((w, i, arr) => ({
-        key: `${w}-${i}`,
+        key: `w-${i}-${w}`,
         text: i < arr.length - 1 ? w + '\u00A0' : w,
       }))
     }
-    // char mode
     return text.split('').map((c, i) => ({
-      key: `${c}-${i}`,
+      key: `c-${i}-${c}`,
       text: c === ' ' ? '\u00A0' : c,
     }))
   }, [text, mode])
@@ -59,21 +72,26 @@ export default function TextReveal({
     <Tag
       ref={ref}
       className={className}
-      style={{ ...style, display: 'flex', flexWrap: 'wrap', overflow: 'hidden' }}
+      style={{
+        ...style,
+        display: 'flex',
+        flexWrap: 'wrap',
+        overflow: 'hidden',
+      }}
       aria-label={text}
     >
       {units.map((unit, i) => (
         <motion.span
           key={unit.key}
           aria-hidden="true"
-          initial={{ opacity: 0, y: '100%' }}
-          animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: '100%' }}
+          initial={{ opacity: 0, y: '110%' }}
+          animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: '110%' }}
           transition={{
             duration,
             delay: i * stagger,
-            ease: [0.16, 1, 0.3, 1],
+            ease: [0.16, 1, 0.3, 1], // expo-out
           }}
-          style={{ display: 'inline-block' }}
+          style={{ display: 'inline-block', willChange: 'transform, opacity' }}
         >
           {unit.text}
         </motion.span>

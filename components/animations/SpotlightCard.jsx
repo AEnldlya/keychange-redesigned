@@ -1,14 +1,14 @@
 'use client'
 import { useRef, useState, useCallback } from 'react'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion'
 
 /**
  * SpotlightCard — Interactive card with cursor-following spotlight and gold glow border.
  *
  * Features:
  *  - Framer Motion spring-based cursor tracking (60fps)
- *  - Gold border that glows on hover
- *  - Radial gradient light follows the mouse
+ *  - Gold border that intensifies on hover
+ *  - Radial gradient spotlight follows the mouse via useMotionTemplate
  *  - No SSR issues ('use client')
  *  - React 18 compatible
  *
@@ -33,9 +33,13 @@ export default function SpotlightCard({
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  // Spring-smoothed values for buttery 60fps animation
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 30, mass: 0.5 })
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 30, mass: 0.5 })
+  // Spring-smoothed for buttery 60fps feel
+  const smoothX = useSpring(mouseX, { stiffness: 300, damping: 30, mass: 0.5 })
+  const smoothY = useSpring(mouseY, { stiffness: 300, damping: 30, mass: 0.5 })
+
+  // Build the radial gradient as a motion template string
+  const spotlightBg = useMotionTemplate`radial-gradient(${radius}px circle at ${smoothX}px ${smoothY}px, ${color}, transparent 70%)`
+  const shimmerBg = useMotionTemplate`radial-gradient(${radius * 1.2}px circle at ${smoothX}px ${smoothY}px, rgba(245,197,24,0.08), transparent 60%)`
 
   const handleMove = useCallback(
     (e) => {
@@ -57,8 +61,8 @@ export default function SpotlightCard({
         borderRadius: '16px',
         border: `1.5px solid ${hovering ? borderColor : 'rgba(245,197,24,0.15)'}`,
         boxShadow: hovering
-          ? `0 0 20px rgba(245,197,24,0.15), 0 0 60px rgba(245,197,24,0.05), inset 0 0 30px rgba(245,197,24,0.03)`
-          : `0 0 0px rgba(245,197,24,0), inset 0 0 0px rgba(245,197,24,0)`,
+          ? '0 0 20px rgba(245,197,24,0.15), 0 0 60px rgba(245,197,24,0.05), inset 0 0 30px rgba(245,197,24,0.03)'
+          : '0 0 0px rgba(245,197,24,0), inset 0 0 0px rgba(245,197,24,0)',
         transition: 'border-color 0.3s ease, box-shadow 0.4s ease',
         ...style,
       }}
@@ -77,9 +81,7 @@ export default function SpotlightCard({
           zIndex: 1,
           opacity: hovering ? 1 : 0,
           transition: 'opacity 0.35s ease',
-          background: `radial-gradient(${radius}px circle at var(--sx) var(--sy), ${color}, transparent 70%)`,
-          '--sx': springX,
-          '--sy': springY,
+          background: spotlightBg,
         }}
       />
 
@@ -93,9 +95,7 @@ export default function SpotlightCard({
           zIndex: 0,
           opacity: hovering ? 1 : 0,
           transition: 'opacity 0.4s ease',
-          background: `radial-gradient(${radius * 1.2}px circle at var(--sx) var(--sy), rgba(245,197,24,0.08), transparent 60%)`,
-          '--sx': springX,
-          '--sy': springY,
+          background: shimmerBg,
         }}
       />
 

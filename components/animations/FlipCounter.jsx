@@ -3,14 +3,23 @@ import { useRef, useEffect, useState } from 'react'
 import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion'
 
 /**
- * FlipCounter — Animated counting number that triggers on scroll.
+ * FlipCounter — Animated number counter that springs to a target on scroll.
+ *
+ * Features:
+ *  - Framer Motion useSpring for physically-based animation
+ *  - IntersectionObserver triggers count-up on scroll
+ *  - Configurable prefix/suffix (e.g., "$", "+", "%")
+ *  - Thousands separator via toLocaleString
+ *  - No SSR issues ('use client')
+ *  - React 18 compatible
  *
  * Props:
- *  - target (number): the number to count up to, default 0
- *  - duration (number): animation duration in seconds, default 2
+ *  - target (number): end value, default 0
+ *  - duration (number): animation time in seconds, default 2
  *  - prefix (string): text before the number, e.g. '$'
  *  - suffix (string): text after the number, e.g. '+'
- *  - separator (boolean): add thousands separators, default true
+ *  - separator (boolean): thousands separators, default true
+ *  - decimals (number): decimal places, default 0
  *  - className, style
  */
 export default function FlipCounter({
@@ -19,6 +28,7 @@ export default function FlipCounter({
   prefix = '',
   suffix = '',
   separator = true,
+  decimals = 0,
   className = '',
   style = {},
 }) {
@@ -46,9 +56,18 @@ export default function FlipCounter({
     duration: duration * 1000,
     bounce: 0,
   })
+
   const display = useTransform(springVal, (v) => {
-    const num = Math.round(v)
-    return separator ? num.toLocaleString() : String(num)
+    const num = decimals > 0
+      ? parseFloat(v.toFixed(decimals))
+      : Math.round(v)
+    if (separator) {
+      return num.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })
+    }
+    return decimals > 0 ? num.toFixed(decimals) : String(num)
   })
 
   useEffect(() => {
@@ -58,10 +77,16 @@ export default function FlipCounter({
   }, [visible, target, motionVal])
 
   return (
-    <span ref={ref} className={className} style={style}>
-      {prefix}
-      <motion.span>{display}</motion.span>
-      {suffix}
+    <span
+      ref={ref}
+      className={className}
+      style={{ display: 'inline-flex', alignItems: 'baseline', ...style }}
+    >
+      {prefix && <span>{prefix}</span>}
+      <motion.span style={{ fontVariantNumeric: 'tabular-nums' }}>
+        {display}
+      </motion.span>
+      {suffix && <span>{suffix}</span>}
     </span>
   )
 }
