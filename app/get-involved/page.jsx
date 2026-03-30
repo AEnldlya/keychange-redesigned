@@ -12,6 +12,8 @@ import GlassCard from '../../components/animations/GlassCard'
 import PulseGlow from '../../components/animations/PulseGlow'
 import StaggeredList from '../../components/animations/StaggeredList'
 import FloatingParticles from '../../components/animations/FloatingParticles'
+import MusicSphere3D from '../../components/3d/MusicSphere3D'
+import SlideInText from '../../components/animations/SlideInText'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -157,6 +159,21 @@ export default function GetInvolved() {
               <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>Schools Reached</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* 3D Music Sphere Showcase */}
+      <section className="kc-section" style={{ background: 'var(--color-bg)', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+        <div className="kc-container" style={{ textAlign: 'center' }}>
+          <SlideInText direction="left" distance={50} blur>
+            <h2 style={{ marginBottom: 'var(--space-4)' }}>Join the Movement</h2>
+          </SlideInText>
+          <SlideInText direction="right" distance={50} delay={0.15} blur>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-6)', maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+              Every volunteer, every donation, every shared moment of music creates ripples of change.
+            </p>
+          </SlideInText>
+          <MusicSphere3D color="#F5C518" accentColor="#2560E8" ringCount={3} noteCount={4} speed={0.8} style={{ maxWidth: 500, margin: '0 auto', height: 350 }} />
         </div>
       </section>
 

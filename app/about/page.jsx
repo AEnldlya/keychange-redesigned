@@ -8,6 +8,8 @@ import TiltCard from '../../components/animations/TiltCard'
 import StaggeredList from '../../components/animations/StaggeredList'
 import ParallaxImage from '../../components/animations/ParallaxImage'
 import InstrumentRotate from '../../components/3d/InstrumentRotate'
+import SlideInText from '../../components/animations/SlideInText'
+import GradientShift from '../../components/animations/GradientShift'
 
 export default function About() {
   const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
@@ -87,23 +89,29 @@ export default function About() {
             mode="word"
             stagger={0.04}
           />
-          <p className="kc-story__body">
-            Many students all around the world who wish to participate are unable to play an
-            instrument and gain music education, due to schools being unable to afford the musical
-            resources needed to support their students.{' '}
-            <strong>Barriers like these prevent too many students from pursuing their love for music.</strong>
-          </p>
-          <p className="kc-story__body">
-            Participating in musical activities offers countless benefits. Musical
-            education not only improves a kid&apos;s mental health but also develops their own creativity
-            and self-expression. Music also develops key skills, such as teamwork, communication,
-            confidence, and more. Students who participate in music actively build needed traits.
-          </p>
-          <p className="kc-story__body">
-            In many cases, students who lack musical opportunities just give up and act as if music
-            wasn&apos;t for them. However, we should challenge these views, as we encourage the growing
-            youth to fight back and reach their maximum potential.
-          </p>
+          <SlideInText direction="right" distance={60} blur>
+            <p className="kc-story__body">
+              Many students all around the world who wish to participate are unable to play an
+              instrument and gain music education, due to schools being unable to afford the musical
+              resources needed to support their students.{' '}
+              <strong>Barriers like these prevent too many students from pursuing their love for music.</strong>
+            </p>
+          </SlideInText>
+          <SlideInText direction="left" distance={60} delay={0.15} blur>
+            <p className="kc-story__body">
+              Participating in musical activities offers countless benefits. Musical
+              education not only improves a kid&apos;s mental health but also develops their own creativity
+              and self-expression. Music also develops key skills, such as teamwork, communication,
+              confidence, and more. Students who participate in music actively build needed traits.
+            </p>
+          </SlideInText>
+          <SlideInText direction="right" distance={60} delay={0.3} blur>
+            <p className="kc-story__body">
+              In many cases, students who lack musical opportunities just give up and act as if music
+              wasn&apos;t for them. However, we should challenge these views, as we encourage the growing
+              youth to fight back and reach their maximum potential.
+            </p>
+          </SlideInText>
         </div>
       </section>
 
@@ -132,8 +140,13 @@ export default function About() {
       </section>
 
       {/* 3D Instrument Showcase */}
-      <section className="kc-section" style={{ background: 'var(--color-bg)' }}>
-        <div className="kc-container" style={{ textAlign: 'center' }}>
+      <section className="kc-section" style={{ background: 'var(--color-bg)', position: 'relative', overflow: 'hidden' }}>
+        <GradientShift
+          colors={['rgba(245,197,24,0.04)', 'rgba(37,96,232,0.03)', 'rgba(155,89,182,0.03)', 'rgba(245,197,24,0.04)']}
+          duration={10}
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        />
+        <div className="kc-container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <h2 style={{ marginBottom: 'var(--space-4)' }}>Every Instrument Tells a Story</h2>
           <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-8)' }}>
             From donated guitars to refurbished keyboards, each instrument carries the potential to change a student&apos;s life.

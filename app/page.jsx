@@ -16,6 +16,10 @@ import NeonGlow from '../components/animations/NeonGlow'
 import HoverLift from '../components/animations/HoverLift'
 import MagneticButton from '../components/animations/MagneticButton'
 import WaveReveal from '../components/animations/WaveReveal'
+import GradientShift from '../components/animations/GradientShift'
+import SlideInText from '../components/animations/SlideInText'
+import RotatingBorder from '../components/animations/RotatingBorder'
+import FloatingCube3D from '../components/3d/FloatingCube3D'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -193,26 +197,32 @@ function StorySection() {
         <RevealOnScroll direction="right" distance={30}>
           <h2 className="kc-story__heading">Our Story</h2>
         </RevealOnScroll>
-        <p className="kc-story__intro">
-          Ansh and Jason noticed a growing gap between students who could access music education
-          and those who could not, and they decided to do something about it. They founded Key
-          Change, a student-led initiative that collects instruments, music supplies, and donations,
-          then connects them with schools and students who need them most.
-        </p>
-        <p className="kc-story__body">
-          Their mission is simple and powerful: to create a world where every student can experience
-          the joy of making music. Key Change provides instruments, funds lessons, and supports
-          programs that inspire young musicians. The organization also welcomes volunteers and donors,
-          inviting communities to join in bringing instruments, instruction, and musical opportunities
-          to students.
-        </p>
-        <p className="kc-story__body">
-          Since its founding, Key Change has focused on practical, sustainable impact—repairing and
-          refurbishing donated instruments, matching resources to school needs, and building
-          partnerships with educators to ensure students get both tools and guidance. By harnessing
-          the energy and empathy of students, Key Change aims not only to fill a resource gap but to
-          spark lasting musical journeys for kids who might otherwise be left out.
-        </p>
+        <SlideInText direction="right" distance={50} blur>
+          <p className="kc-story__intro">
+            Ansh and Jason noticed a growing gap between students who could access music education
+            and those who could not, and they decided to do something about it. They founded Key
+            Change, a student-led initiative that collects instruments, music supplies, and donations,
+            then connects them with schools and students who need them most.
+          </p>
+        </SlideInText>
+        <SlideInText direction="left" distance={50} delay={0.15} blur>
+          <p className="kc-story__body">
+            Their mission is simple and powerful: to create a world where every student can experience
+            the joy of making music. Key Change provides instruments, funds lessons, and supports
+            programs that inspire young musicians. The organization also welcomes volunteers and donors,
+            inviting communities to join in bringing instruments, instruction, and musical opportunities
+            to students.
+          </p>
+        </SlideInText>
+        <SlideInText direction="right" distance={50} delay={0.3} blur>
+          <p className="kc-story__body">
+            Since its founding, Key Change has focused on practical, sustainable impact—repairing and
+            refurbishing donated instruments, matching resources to school needs, and building
+            partnerships with educators to ensure students get both tools and guidance. By harnessing
+            the energy and empathy of students, Key Change aims not only to fill a resource gap but to
+            spark lasting musical journeys for kids who might otherwise be left out.
+          </p>
+        </SlideInText>
         <Link href="/about" className="kc-btn kc-btn--outline">Learn More</Link>
       </div>
       <ScrollChevron />

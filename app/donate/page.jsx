@@ -11,6 +11,8 @@ import SpotlightCard from '../../components/animations/SpotlightCard'
 import ShimmerEffect from '../../components/animations/ShimmerEffect'
 import RevealOnScroll from '../../components/animations/RevealOnScroll'
 import HoverLift from '../../components/animations/HoverLift'
+import GradientShift from '../../components/animations/GradientShift'
+import RotatingBorder from '../../components/animations/RotatingBorder'
 
 const CITY_SUGGESTIONS = ['Hanover', 'Norwich']
 const STATE_SUGGESTIONS = ['New Hampshire', 'Vermont']
@@ -145,9 +147,14 @@ export default function Donate() {
 
   return (
     <>
-      <section className="kc-page-hero">
+      <section className="kc-page-hero" style={{ position: 'relative', overflow: 'hidden' }}>
+        <GradientShift
+          colors={['rgba(245,197,24,0.06)', 'rgba(37,96,232,0.04)', 'rgba(155,89,182,0.05)', 'rgba(245,197,24,0.06)']}
+          duration={12}
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        />
         <ScrollChevron />
-        <div className="kc-container">
+        <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
           <h1>Donate to Key Change</h1>
           <p>
             Donate your working instruments and music supplies. All contributions help turn unused
@@ -198,7 +205,8 @@ export default function Donate() {
               <ShimmerEffect width="85%" height={16} borderRadius={8} />
             </div>
           )}
-          <div className="kc-glass kc-glass--gold">
+          <RotatingBorder colors={['#F5C518', '#2560E8', '#9B59B6', '#F5C518']} borderWidth={1} borderRadius={20} duration={4} background="var(--color-surface, #0a0a15)">
+          <div className="kc-glass kc-glass--gold" style={{ border: 'none' }}>
             {status === 'success' ? (
               <FormSuccess
                 variant="celebrate"
@@ -373,6 +381,7 @@ export default function Donate() {
               </form>
             )}
           </div>
+          </RotatingBorder>
         </div>
       </section>
 
