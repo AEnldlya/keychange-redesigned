@@ -160,6 +160,9 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* Wave divider */}
+      <WaveEffect color="rgba(245,197,24,0.04)" layers={3} height={140} />
+
       {/* FAQ */}
       <section className={`kc-section kc-reveal${faqVisible ? ' visible' : ''}`} ref={faqRef} style={{ background: 'var(--color-surface)' }}>
         <div className="kc-container">
