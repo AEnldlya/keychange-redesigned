@@ -20,6 +20,14 @@ import GradientShift from '../components/animations/GradientShift'
 import SlideInText from '../components/animations/SlideInText'
 import RotatingBorder from '../components/animations/RotatingBorder'
 import FloatingCube3D from '../components/3d/FloatingCube3D'
+import MeteorShower from '../components/animations/MeteorShower'
+import AnimatedGradientText from '../components/animations/AnimatedGradientText'
+import Marquee from '../components/animations/Marquee'
+import Sparkles from '../components/animations/Sparkles'
+import Spotlight from '../components/animations/Spotlight'
+import Typewriter from '../components/animations/Typewriter'
+import BorderBeam from '../components/animations/BorderBeam'
+import NumberTicker from '../components/animations/NumberTicker'
 
 /* ── Floating notes ── */
 function HeroNotes() {
@@ -92,6 +100,15 @@ function HeroSection() {
             <span className="kc-hero__serif">&nbsp;Students</span>
           </span>
         </h1>
+        <p className="kc-hero__tagline" style={{ fontSize: 'var(--text-lg, 1.15rem)', color: 'var(--color-text-muted)', marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)' }}>
+          <Typewriter
+            phrases={['Recycling instruments for students', 'Building community through music', 'Every student deserves a chance to play']}
+            typeSpeed={60}
+            deleteSpeed={30}
+            pauseDuration={2500}
+            cursorColor="#F5C518"
+          />
+        </p>
         <div className="kc-hero__ctas">
           <MagneticButton as="div" strength={0.3}>
             <Link href="/get-involved" className="kc-btn kc-btn--gold">Get Involved</Link>
@@ -130,12 +147,21 @@ function StatSection() {
   }, [visible])
 
   return (
-    <section className={`kc-section kc-stat kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
-      <div className="kc-container">
+    <section className={`kc-section kc-stat kc-reveal${visible ? ' visible' : ''}`} ref={ref} style={{ position: 'relative', overflow: 'hidden' }}>
+      <MeteorShower count={12} color="#F5C518" angle={215} minSpeed={3} maxSpeed={8} />
+      <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
         <p className="kc-stat__source">According to the 2019 Current newsletter</p>
-        <NeonGlow color="#F5C518" intensity={0.6} mode="text" duration={3}>
-          <span className="kc-stat__number" ref={countRef}>0</span>
-        </NeonGlow>
+        <Sparkles count={8} color="#F5C518" minSize={10} maxSize={20}>
+          <NeonGlow color="#F5C518" intensity={0.6} mode="text" duration={3}>
+            <NumberTicker
+              target={3609698}
+              duration={2.5}
+              separator
+              className="kc-stat__number"
+              style={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', fontFamily: 'inherit' }}
+            />
+          </NeonGlow>
+        </Sparkles>
         <p className="kc-stat__label">
           students across the United States do not have access to music education in public schools
         </p>
@@ -160,26 +186,30 @@ const STEPS = [
 function HowItWorks() {
   const [ref, visible] = useReveal({ threshold: 0.15 })
   return (
-    <section className={`kc-section kc-how kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
-      <div className="kc-container">
-        <WaveReveal text="How It Works" as="h2" className="kc-how__heading" amplitude={15} stagger={0.04} />
-        <div className="kc-how__grid kc-stagger">
-          {STEPS.map((step, i) => (
-            <RevealOnScroll key={i} direction="up" delay={i * 0.1}>
-              <SpotlightCard radius={250}>
-                <HoverLift lift={6}>
-                  <div className="kc-how__step" style={{ '--i': i }}>
-                    <div className="kc-how__icon">{step.icon}</div>
-                    <h3 className="kc-how__step-title">{step.title}</h3>
-                    <p className="kc-how__step-desc">{step.desc}</p>
-                  </div>
-                </HoverLift>
-              </SpotlightCard>
-            </RevealOnScroll>
-          ))}
+    <Spotlight radius={500} color="rgba(245,197,24,0.04)">
+      <section className={`kc-section kc-how kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
+        <div className="kc-container">
+          <WaveReveal text="How It Works" as="h2" className="kc-how__heading" amplitude={15} stagger={0.04} />
+          <div className="kc-how__grid kc-stagger">
+            {STEPS.map((step, i) => (
+              <RevealOnScroll key={i} direction="up" delay={i * 0.1}>
+                <BorderBeam size={180} duration={5 + i} colorFrom="#F5C518" colorTo="#2560E8" borderRadius={16} background="var(--color-surface, #0a0a15)">
+                  <SpotlightCard radius={250}>
+                    <HoverLift lift={6}>
+                      <div className="kc-how__step" style={{ '--i': i }}>
+                        <div className="kc-how__icon">{step.icon}</div>
+                        <h3 className="kc-how__step-title">{step.title}</h3>
+                        <p className="kc-how__step-desc">{step.desc}</p>
+                      </div>
+                    </HoverLift>
+                  </SpotlightCard>
+                </BorderBeam>
+              </RevealOnScroll>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </Spotlight>
   )
 }
 
