@@ -1,85 +1,11 @@
 'use client'
+
 import { useState } from 'react'
-import Link from 'next/link'
-import FormSuccess from '../../components/FormSuccess'
-import { useReveal } from '../../hooks/useReveal'
-import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
+import { Mail, MapPin, CheckCircle, ArrowRight } from 'lucide-react'
 
-const FAQ_ITEMS = [
-  {
-    question: 'How long does it take to get a response?',
-    answer: 'We typically respond to all messages within 48 hours. For urgent matters, please indicate that in your message subject.'
-  },
-  {
-    question: 'How can I donate instruments?',
-    answer: 'Head to our Donate page to fill out a simple form with details about your instrument. We accept all types in any condition—even if they need repair.'
-  },
-  {
-    question: 'Can I volunteer with Key Change?',
-    answer: 'Absolutely. We need help with instrument collection, cleaning, minor repairs, and outreach. Visit our Get Involved page to learn more.'
-  },
-  {
-    question: 'Where is Key Change based?',
-    answer: 'We are based in the Upper Valley area of New Hampshire and Vermont, primarily serving the Hanover and Norwich communities and surrounding towns.'
-  },
-  {
-    question: 'Do you accept monetary donations?',
-    answer: 'Yes. Financial contributions help us cover repair costs, purchase accessories like cases and strings, and fund lesson scholarships for students.'
-  }
-]
-
-function FAQItem({ question, answer, isOpen, onClick }) {
-  return (
-    <div className="kc-faq__item">
-      <button 
-        className="kc-faq__question"
-        onClick={onClick}
-        aria-expanded={isOpen}
-      >
-        <span>{question}</span>
-        <span className={`kc-faq__icon ${isOpen ? 'kc-faq__icon--open' : ''}`}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </span>
-      </button>
-      <div className={`kc-faq__answer ${isOpen ? 'kc-faq__answer--open' : ''}`}>
-        <p>{answer}</p>
-      </div>
-    </div>
-  )
-}
-
-function FAQSection() {
-  const [openIndex, setOpenIndex] = useState(null)
-  const [ref, visible] = useReveal({ threshold: 0.1 })
-  
-  return (
-    <section ref={ref} className="kc-section">
-      <div className="kc-container kc-container--narrow">
-        <div className={`kc-faq ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
-          <h2 className="kc-faq__title">Frequently Asked Questions</h2>
-          <div className="kc-faq__list">
-            {FAQ_ITEMS.map((item, index) => (
-              <FAQItem
-                key={index}
-                question={item.question}
-                answer={item.answer}
-                isOpen={openIndex === index}
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export default function Contact() {
+export default function ContactPage() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
-  const [ref, visible] = useReveal({ threshold: 0.1 })
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -89,20 +15,20 @@ export default function Contact() {
       last_name: fd.get('last_name'),
       email: fd.get('email'),
       message: fd.get('message'),
+      newsletter: fd.get('newsletter') === 'yes',
     }
 
-    const validationErrors = validateForm(data, {
-      first_name: [v => validateRequired(v, 'First name')],
-      last_name: [v => validateRequired(v, 'Last name')],
-      email: [v => validateRequired(v, 'Email'), validateEmail],
-      message: [v => validateRequired(v, 'Message')],
-    })
-    
-    if (validationErrors) {
-      setErrors(validationErrors)
+    const newErrors = {}
+    if (!data.first_name) newErrors.first_name = 'First name is required'
+    if (!data.last_name) newErrors.last_name = 'Last name is required'
+    if (!data.email) newErrors.email = 'Email is required'
+    if (!data.message) newErrors.message = 'Message is required'
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
       return
     }
-    
+
     setErrors({})
     setStatus('submitting')
 
@@ -110,18 +36,9 @@ export default function Contact() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          newsletter: fd.get('newsletter') === 'yes',
-          source: 'Contact Page',
-        }),
+        body: JSON.stringify({ ...data, source: 'Contact Page' }),
       })
-      if (res.ok) { 
-        setStatus('success')
-        e.target.reset() 
-      } else {
-        setStatus('error')
-      }
+      setStatus(res.ok ? 'success' : 'error')
     } catch {
       setStatus('error')
     }
@@ -129,131 +46,263 @@ export default function Contact() {
 
   return (
     <>
-      {/* Header */}
-      <section className="kc-page-header">
-        <div className="kc-container">
-          <h1>Contact Us</h1>
-          <p>
-            Have a question about donating? Want to volunteer? Just want to say hello? 
-            Drop us a line and we&apos;ll get back to you within 48 hours.
-          </p>
-        </div>
-      </section>
+      {/* Page Header */}
+      <div className="page-header">
+        <h1>Contact Us</h1>
+        <p>Have a question? We would love to hear from you.</p>
+      </div>
 
-      {/* Contact Info Cards */}
-      <section className="kc-section kc-section--alt">
-        <div className="kc-container">
-          <div className="kc-contact-page__info">
-            <div className="kc-contact-page__card">
-              <span className="kc-contact-page__label">Email</span>
-              <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
-            </div>
-            <div className="kc-contact-page__card">
-              <span className="kc-contact-page__label">Instagram</span>
-              <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">
-                @keychangeproject
-              </a>
-            </div>
-            <div className="kc-contact-page__card">
-              <span className="kc-contact-page__label">Location</span>
-              <span>Upper Valley, NH & VT</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Contact Grid */}
+      <section className="section" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="contact-grid">
+            {/* Contact Info */}
+            <div className="contact-info" style={{ textAlign: 'left' }}>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.5rem',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                Get in touch
+              </h2>
+              <p
+                style={{
+                  fontSize: '1.125rem',
+                  color: 'var(--color-ink-light)',
+                  marginBottom: '2rem',
+                }}
+              >
+                Whether you have an instrument to donate, want to volunteer, or
+                just have a question, we are here to help.
+              </p>
 
-      {/* Contact Form */}
-      <section ref={ref} className="kc-section">
-        <div className="kc-container kc-container--narrow">
-          <div className={`kc-contact-page__form ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
-            <h2>Send us a message</h2>
-            
-            {status === 'success' ? (
-              <FormSuccess
-                title="Message sent"
-                message="Thanks for reaching out. We'll get back to you within 48 hours."
-              />
-            ) : (
-              <form onSubmit={handleSubmit} className="kc-form">
-                <div className="kc-form__row">
-                  <div className="kc-form__field">
-                    <label className="kc-form__label">
-                      First Name <span>(required)</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      name="first_name"
-                      placeholder="Jane"
-                      className={errors.first_name ? 'error' : ''} 
-                    />
-                    {errors.first_name && <span className="kc-form__error">{errors.first_name}</span>}
-                  </div>
-                  <div className="kc-form__field">
-                    <label className="kc-form__label">
-                      Last Name <span>(required)</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      name="last_name"
-                      placeholder="Smith"
-                      className={errors.last_name ? 'error' : ''} 
-                    />
-                    {errors.last_name && <span className="kc-form__error">{errors.last_name}</span>}
-                  </div>
-                </div>
-
-                <div className="kc-form__field">
-                  <label className="kc-form__label">
-                    Email <span>(required)</span>
-                  </label>
-                  <input 
-                    type="email" 
-                    name="email"
-                    placeholder="jane@example.com"
-                    className={errors.email ? 'error' : ''} 
-                  />
-                  {errors.email && <span className="kc-form__error">{errors.email}</span>}
-                </div>
-
-                <label className="kc-checkbox">
-                  <input type="checkbox" name="newsletter" value="yes" />
-                  <span>Keep me updated on Key Change news</span>
-                </label>
-
-                <div className="kc-form__field">
-                  <label className="kc-form__label">
-                    Message <span>(required)</span>
-                  </label>
-                  <textarea 
-                    name="message" 
-                    rows={5}
-                    placeholder="Tell us how we can help..."
-                    className={errors.message ? 'error' : ''} 
-                  />
-                  {errors.message && <span className="kc-form__error">{errors.message}</span>}
-                </div>
-
-                {status === 'error' && (
-                  <div className="kc-form__status kc-form__status--error" role="alert">
-                    Something went wrong. Please try again.
-                  </div>
-                )}
-
-                <button 
-                  type="submit" 
-                  className="kc-btn kc-btn--primary kc-btn--full"
-                  disabled={status === 'submitting'}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.5rem',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '1rem',
+                  }}
                 >
-                  {status === 'submitting' ? 'Sending...' : 'Send Message'}
-                </button>
-              </form>
-            )}
+                  <Mail
+                    size={24}
+                    style={{ color: 'var(--color-terracotta)', marginTop: '4px' }}
+                  />
+                  <div>
+                    <strong
+                      style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: 'var(--color-ink-muted)',
+                        marginBottom: '0.25rem',
+                      }}
+                    >
+                      Email
+                    </strong>
+                    <a
+                      href="mailto:keychange.team@gmail.com"
+                      style={{
+                        fontSize: '1.125rem',
+                        color: 'var(--color-terracotta)',
+                      }}
+                    >
+                      keychange.team@gmail.com
+                    </a>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '1rem',
+                  }}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-terracotta)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '4px' }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  <div>
+                    <strong
+                      style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: 'var(--color-ink-muted)',
+                        marginBottom: '0.25rem',
+                      }}
+                    >
+                      Instagram
+                    </strong>
+                    <a
+                      href="https://instagram.com/keychangeproject/"
+                      target="_blank"
+                      rel="noopener"
+                      style={{
+                        fontSize: '1.125rem',
+                        color: 'var(--color-terracotta)',
+                      }}
+                    >
+                      @keychangeproject
+                    </a>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '1rem',
+                  }}
+                >
+                  <MapPin
+                    size={24}
+                    style={{ color: 'var(--color-terracotta)', marginTop: '4px' }}
+                  />
+                  <div>
+                    <strong
+                      style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: 'var(--color-ink-muted)',
+                        marginBottom: '0.25rem',
+                      }}
+                    >
+                      Location
+                    </strong>
+                    <span style={{ fontSize: '1.125rem' }}>
+                      Upper Valley, NH & VT
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Form */}
+            <div className="contact-form-wrapper">
+              {status === 'success' ? (
+                <div className="form-success">
+                  <CheckCircle
+                    size={64}
+                    style={{
+                      color: 'var(--color-terracotta)',
+                      marginBottom: '1.5rem',
+                    }}
+                  />
+                  <h3>Message sent</h3>
+                  <p>
+                    Thanks for reaching out. We will get back to you within 48
+                    hours.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">
+                        First Name <span>(required)</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="first_name"
+                        className={`form-input ${errors.first_name ? 'error' : ''}`}
+                        placeholder="Jane"
+                      />
+                      {errors.first_name && (
+                        <span className="form-error">{errors.first_name}</span>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">
+                        Last Name <span>(required)</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="last_name"
+                        className={`form-input ${errors.last_name ? 'error' : ''}`}
+                        placeholder="Smith"
+                      />
+                      {errors.last_name && (
+                        <span className="form-error">{errors.last_name}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      Email <span>(required)</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      className={`form-input ${errors.email ? 'error' : ''}`}
+                      placeholder="jane@example.com"
+                    />
+                    {errors.email && (
+                      <span className="form-error">{errors.email}</span>
+                    )}
+                  </div>
+
+                  <label className="form-checkbox">
+                    <input type="checkbox" name="newsletter" value="yes" />
+                    <span>Keep me updated on Key Change news</span>
+                  </label>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      Message <span>(required)</span>
+                    </label>
+                    <textarea
+                      name="message"
+                      className={`form-textarea ${errors.message ? 'error' : ''}`}
+                      placeholder="How can we help you?"
+                      rows={5}
+                    />
+                    {errors.message && (
+                      <span className="form-error">{errors.message}</span>
+                    )}
+                  </div>
+
+                  {status === 'error' && (
+                    <div
+                      className="form-error"
+                      style={{ marginBottom: '1rem' }}
+                    >
+                      Something went wrong. Please try again.
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: '100%' }}
+                    disabled={status === 'submitting'}
+                  >
+                    {status === 'submitting' ? (
+                      'Sending...'
+                    ) : (
+                      <>
+                        Send Message
+                        <ArrowRight size={18} />
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* FAQ */}
-      <FAQSection />
     </>
   )
 }

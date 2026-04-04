@@ -1,81 +1,36 @@
-import '../styles/global.css'
+import '../styles/globals.css'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
-import PasswordGate from '../components/PasswordGate'
-import ScrollToTop from '../components/ScrollToTop'
-
-const PASSWORD_ENABLED = process.env.NEXT_PUBLIC_PASSWORD_ENABLED === 'true'
 
 export const metadata = {
   title: {
-    default: 'Key Change — Making Music Accessible to All Students',
+    default: 'Key Change — Music Belongs to Everyone',
     template: '%s | Key Change',
   },
   description:
-    'Key Change is a student-led nonprofit collecting and redistributing musical instruments to students and programs that lack resources. Based in Hanover, NH.',
+    'Key Change is a student-led nonprofit collecting and redistributing musical instruments to students who lack access to music education.',
   openGraph: {
-    title: 'Key Change — Making Music Accessible to All Students',
+    title: 'Key Change — Music Belongs to Everyone',
     description:
-      'Student-led nonprofit collecting and redistributing musical instruments to students who need them.',
+      'Student-led nonprofit collecting and redistributing musical instruments.',
     url: 'https://keychange.org',
     siteName: 'Key Change',
     type: 'website',
     locale: 'en_US',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Key Change',
-    description: 'Making music accessible to all students.',
-  },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://keychange.org'),
-}
-
-function SiteShell({ children }) {
-  return (
-    <>
-      <ScrollToTop />
-      <a href="#main" className="skip-link">Skip to content</a>
-      <Nav />
-      <main id="main">{children}</main>
-      <Footer />
-    </>
-  )
+  metadataBase: new URL('https://keychange.org'),
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'NonprofitOrganization',
-              name: 'Key Change',
-              alternateName: 'The Key Change Project',
-              description:
-                'Student-led nonprofit collecting and redistributing musical instruments',
-              url: 'https://keychange.org',
-              email: 'keychange.team@gmail.com',
-              areaServed: {
-                '@type': 'Place',
-                name: 'Upper Valley, New Hampshire and Vermont',
-              },
-              foundingDate: '2024',
-              sameAs: ['https://instagram.com/keychangeproject/'],
-            }),
-          }}
-        />
-      </head>
       <body>
-        {PASSWORD_ENABLED ? (
-          <PasswordGate>
-            <SiteShell>{children}</SiteShell>
-          </PasswordGate>
-        ) : (
-          <SiteShell>{children}</SiteShell>
-        )}
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <Nav />
+        <main id="main">{children}</main>
+        <Footer />
       </body>
     </html>
   )

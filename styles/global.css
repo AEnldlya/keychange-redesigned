@@ -1,9 +1,0 @@
-/* ═══════════════════════════════════════════════════════════════
-   Key Change — Global Stylesheet
-   Consolidated from: design-tokens.css + base.css + components.css
-   Replaces: old style.css + modern.css + global.css
-   ═══════════════════════════════════════════════════════════════ */
-
-@import './design-tokens.css';
-@import './base.css';
-@import './components.css';
