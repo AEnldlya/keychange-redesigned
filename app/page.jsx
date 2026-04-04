@@ -1,323 +1,234 @@
 'use client'
-import { useEffect, useRef, useMemo, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useReveal } from '../hooks/useReveal'
 import FormSuccess from '../components/FormSuccess'
-import ScrollChevron from '../components/ScrollChevron'
 import { validateEmail, validateRequired, validateForm } from '../lib/validate'
-import AuroraBackground from '../components/animations/AuroraBackground'
-import SpotlightCard from '../components/animations/SpotlightCard'
-import TextReveal from '../components/animations/TextReveal'
-import WaveEffect from '../components/animations/WaveEffect'
-import MusicNote3D from '../components/3d/MusicNote3D'
-import FloatingParticles from '../components/animations/FloatingParticles'
-import RevealOnScroll from '../components/animations/RevealOnScroll'
-import NeonGlow from '../components/animations/NeonGlow'
-import HoverLift from '../components/animations/HoverLift'
-import MagneticButton from '../components/animations/MagneticButton'
-import WaveReveal from '../components/animations/WaveReveal'
-import GradientShift from '../components/animations/GradientShift'
-import SlideInText from '../components/animations/SlideInText'
-import RotatingBorder from '../components/animations/RotatingBorder'
-import FloatingCube3D from '../components/3d/FloatingCube3D'
-import MeteorShower from '../components/animations/MeteorShower'
-import AnimatedGradientText from '../components/animations/AnimatedGradientText'
-import Marquee from '../components/animations/Marquee'
-import Sparkles from '../components/animations/Sparkles'
-import Spotlight from '../components/animations/Spotlight'
-import Typewriter from '../components/animations/Typewriter'
-import BorderBeam from '../components/animations/BorderBeam'
-import NumberTicker from '../components/animations/NumberTicker'
 
-/* ── Floating notes ── */
-function HeroNotes() {
-  const chars = ['♩', '♪', '♫', '♬']
-  const notes = useMemo(() =>
-    Array.from({ length: 18 }, (_, i) => ({
-      id: i,
-      char: chars[Math.floor(Math.random() * chars.length)],
-      x: Math.random() * 95 + 2,
-      size: 0.9 + Math.random() * 1.8,
-      dur: 6 + Math.random() * 8,
-      delay: Math.random() * 8,
-    })), [])
-
-  return (
-    <div className="kc-hero__notes" aria-hidden="true">
-      {notes.map(n => (
-        <span
-          key={n.id}
-          className="kc-hero__note"
-          style={{
-            '--note-x': `${n.x}%`,
-            '--note-size': `${n.size}rem`,
-            '--note-dur': `${n.dur}s`,
-            '--note-delay': `${n.delay}s`,
-          }}
-        >
-          {n.char}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-/* ── Hero Section ── */
+/* ── Hero Section ──
+   Strong minimal headline, single CTA, subtle signature animation
+*/
 function HeroSection() {
-  const bgRef = useRef(null)
-
+  const [loaded, setLoaded] = useState(false)
+  
   useEffect(() => {
-    function onScroll() {
-      if (bgRef.current && window.scrollY < window.innerHeight * 1.5) {
-        bgRef.current.style.transform = `translateY(${window.scrollY * 0.4}px)`
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const timer = setTimeout(() => setLoaded(true), 100)
+    return () => clearTimeout(timer)
   }, [])
-
+  
   return (
     <section className="kc-hero">
-      <div className="kc-hero__parallax" ref={bgRef}>
-        <img src="/assets/hero.webp" alt="" aria-hidden="true" className="kc-hero__img" />
-      </div>
-      <div className="kc-hero__overlay" />
-      <AuroraBackground />
-      <FloatingParticles count={25} color="rgba(245,197,24,0.08)" maxSize={6} />
-      <MusicNote3D noteCount={10} showGlow />
-      <HeroNotes />
       <div className="kc-hero__content">
-        <h1 className="kc-hero__headline">
-          <span className="kc-hero__line">
-            <span className="kc-hero__thin">Making</span>
-            <span className="kc-hero__serif">&nbsp;Music</span>
-          </span>
-          <span className="kc-hero__line">
-            <span className="kc-hero__serif">Accessible</span>
-          </span>
-          <span className="kc-hero__line">
-            <span className="kc-hero__thin">to All</span>
-            <span className="kc-hero__serif">&nbsp;Students</span>
-          </span>
-        </h1>
-        <p className="kc-hero__tagline" style={{ fontSize: 'var(--text-lg, 1.15rem)', color: 'var(--color-text-muted)', marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)' }}>
-          <Typewriter
-            phrases={['Recycling instruments for students', 'Building community through music', 'Every student deserves a chance to play']}
-            typeSpeed={60}
-            deleteSpeed={30}
-            pauseDuration={2500}
-            cursorColor="#F5C518"
-          />
-        </p>
-        <div className="kc-hero__ctas">
-          <MagneticButton as="div" strength={0.3}>
-            <Link href="/get-involved" className="kc-btn kc-btn--gold">Get Involved</Link>
-          </MagneticButton>
-          <MagneticButton as="div" strength={0.3}>
-            <Link href="/donate" className="kc-btn kc-btn--outline">Donate</Link>
-          </MagneticButton>
-        </div>
-      </div>
-      <ScrollChevron className="kc-chevron--hero" />
-    </section>
-  )
-}
-
-/* ── Impact Stat ── */
-function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3) }
-
-function StatSection() {
-  const [ref, visible] = useReveal({ threshold: 0.25 })
-  const countRef = useRef(null)
-  const triggered = useRef(false)
-
-  useEffect(() => {
-    if (!visible || triggered.current || !countRef.current) return
-    triggered.current = true
-    const target = 3609698
-    const duration = 2500
-    const start = performance.now()
-    function tick(now) {
-      const progress = Math.min((now - start) / duration, 1)
-      countRef.current.textContent = Math.floor(easeOutCubic(progress) * target).toLocaleString()
-      if (progress < 1) requestAnimationFrame(tick)
-      else countRef.current.textContent = target.toLocaleString()
-    }
-    requestAnimationFrame(tick)
-  }, [visible])
-
-  return (
-    <section className={`kc-section kc-stat kc-reveal${visible ? ' visible' : ''}`} ref={ref} style={{ position: 'relative', overflow: 'hidden' }}>
-      <MeteorShower count={12} color="#F5C518" angle={215} minSpeed={3} maxSpeed={8} />
-      <div className="kc-container" style={{ position: 'relative', zIndex: 1 }}>
-        <p className="kc-stat__source">According to the 2019 Current newsletter</p>
-        <Sparkles count={8} color="#F5C518" minSize={10} maxSize={20}>
-          <NeonGlow color="#F5C518" intensity={0.6} mode="text" duration={3}>
-            <NumberTicker
-              target={3609698}
-              duration={2.5}
-              separator
-              className="kc-stat__number"
-              style={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', fontFamily: 'inherit' }}
-            />
-          </NeonGlow>
-        </Sparkles>
-        <p className="kc-stat__label">
-          students across the United States do not have access to music education in public schools
-        </p>
-        <div className="kc-stat__divider" />
-        <p className="kc-stat__body">
-          Due to the high costs of music equipment, schools&apos; music programs suffer from budget cuts and outdated supplies.
-        </p>
-      </div>
-      <ScrollChevron />
-    </section>
-  )
-}
-
-/* ── How It Works ── */
-const STEPS = [
-  { icon: '🎸', title: 'Collect', desc: 'Donors submit instruments they no longer use through our simple form.' },
-  { icon: '🔧', title: 'Inspect & Repair', desc: 'We inspect every instrument and make repairs so it\'s ready to play.' },
-  { icon: '🤝', title: 'Match', desc: 'We connect instruments with students and programs that need them most.' },
-  { icon: '🎵', title: 'Play', desc: 'Students receive instruments and begin their musical journey.' },
-]
-
-function HowItWorks() {
-  const [ref, visible] = useReveal({ threshold: 0.15 })
-  return (
-    <Spotlight radius={500} color="rgba(245,197,24,0.04)">
-      <section className={`kc-section kc-how kc-reveal${visible ? ' visible' : ''}`} ref={ref}>
-        <div className="kc-container">
-          <WaveReveal text="How It Works" as="h2" className="kc-how__heading" amplitude={15} stagger={0.04} />
-          <div className="kc-how__grid kc-stagger">
-            {STEPS.map((step, i) => (
-              <RevealOnScroll key={i} direction="up" delay={i * 0.1}>
-                <BorderBeam size={180} duration={5 + i} colorFrom="#F5C518" colorTo="#2560E8" borderRadius={16} background="var(--color-surface, #0a0a15)">
-                  <SpotlightCard radius={250}>
-                    <HoverLift lift={6}>
-                      <div className="kc-how__step" style={{ '--i': i }}>
-                        <div className="kc-how__icon">{step.icon}</div>
-                        <h3 className="kc-how__step-title">{step.title}</h3>
-                        <p className="kc-how__step-desc">{step.desc}</p>
-                      </div>
-                    </HoverLift>
-                  </SpotlightCard>
-                </BorderBeam>
-              </RevealOnScroll>
-            ))}
+        <div className={`kc-hero__text ${loaded ? 'kc-hero__text--visible' : ''}`}>
+          <h1 className="kc-hero__headline">
+            <span className="kc-hero__line">Music belongs</span>
+            <span className="kc-hero__line kc-hero__line--accent">to everyone.</span>
+          </h1>
+          <p className="kc-hero__subhead">
+            3.6 million students in the US lack access to music education. 
+            We collect unused instruments and put them in the hands of students 
+            who need them most.
+          </p>
+          <div className="kc-hero__cta">
+            <Link href="/get-involved" className="kc-btn kc-btn--primary">
+              Get Involved
+            </Link>
           </div>
         </div>
-      </section>
-    </Spotlight>
+        
+        <div className={`kc-hero__image ${loaded ? 'kc-hero__image--visible' : ''}`}>
+          <img 
+            src="/assets/hero.webp" 
+            alt="Musical instruments" 
+          />
+        </div>
+      </div>
+      
+      <div className="kc-hero__scroll" aria-hidden="true">
+        <span>Scroll</span>
+        <div className="kc-hero__scroll-line" />
+      </div>
+    </section>
   )
 }
 
-/* ── Our Story ── */
+/* ── Impact Stats ──
+   Authentic social proof, no fake ticker animations
+*/
+function ImpactSection() {
+  const [ref, visible] = useReveal({ threshold: 0.2 })
+  
+  return (
+    <section ref={ref} className={`kc-section kc-impact ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+      <div className="kc-container">
+        <div className="kc-impact__grid">
+          <div className="kc-impact__stat">
+            <span className="kc-impact__number">3,609,698</span>
+            <p className="kc-impact__label">
+              Students in the US without access to music education
+            </p>
+            <span className="kc-impact__source">Source: 2019 NAEP Arts Assessment</span>
+          </div>
+          
+          <div className="kc-impact__content">
+            <h2>The gap is real</h2>
+            <p>
+              Budget cuts and rising instrument costs have left millions of students 
+              on the sidelines. Schools can&apos;t afford equipment. Families can&apos;t afford 
+              rentals. Meanwhile, thousands of instruments sit unused in closets and 
+              attics across the country.
+            </p>
+            <p>
+              We bridge that gap—collecting, repairing, and redistributing instruments 
+              to students and programs that need them.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ── How It Works ──
+   Intentional asymmetric layout
+*/
+function HowItWorks() {
+  const [ref, visible] = useReveal({ threshold: 0.15 })
+  
+  const steps = [
+    {
+      number: '01',
+      title: 'Collect',
+      description: 'We receive instrument donations from community members, schools, and music stores—everything from violins to drum kits.',
+    },
+    {
+      number: '02',
+      title: 'Restore',
+      description: 'Each instrument is inspected, cleaned, and repaired by our team of volunteer technicians and local luthiers.',
+    },
+    {
+      number: '03',
+      title: 'Match',
+      description: 'We partner with schools and community programs to identify students who need instruments and match them with what we have.',
+    },
+    {
+      number: '04',
+      title: 'Deliver',
+      description: 'Instruments go directly into students&apos; hands, often with a case, accessories, and connections to local teachers.',
+    },
+  ]
+  
+  return (
+    <section ref={ref} className="kc-section kc-section--alt kc-how">
+      <div className="kc-container">
+        <div className="kc-how__header">
+          <h2>How it works</h2>
+          <p>Four steps from donation to a student&apos;s first notes</p>
+        </div>
+        
+        <div className={`kc-how__grid ${visible ? 'kc-stagger visible' : 'kc-stagger'}`}>
+          {steps.map((step) => (
+            <div key={step.number} className="kc-how__step">
+              <span className="kc-how__number">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ── Story Section ──
+   Asymmetric editorial layout
+*/
 function StorySection() {
-  const [imgRef, imgVisible] = useReveal({ threshold: 0.15 })
-  const [textRef, textVisible] = useReveal({ threshold: 0.15 })
-
+  const [ref, visible] = useReveal({ threshold: 0.15 })
+  
   return (
-    <section className="kc-story">
-      <div className={`kc-story__image-wrap${imgVisible ? ' visible' : ''}`} ref={imgRef}>
-        <img src="/assets/microphone.webp" alt="Microphone close-up" className="kc-story__img" />
+    <section ref={ref} className="kc-section kc-story">
+      <div className="kc-container">
+        <div className={`kc-story__grid ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+          <div className="kc-story__image">
+            <img src="/assets/guitarra.webp" alt="Guitar being played" />
+          </div>
+          
+          <div className="kc-story__content">
+            <span className="kc-story__eyebrow">Our Story</span>
+            <h2>Started by students,<br />for students</h2>
+            <div className="kc-divider" />
+            <p>
+              Key Change began when two high schoolers—Ansh and Jason—noticed something 
+              wrong. Their school had a thriving music program. Other schools just miles 
+              away had nothing. The instruments existed. The students existed. Only the 
+              connection was missing.
+            </p>
+            <p>
+              What started as a single instrument drive has grown into a sustained effort 
+              to democratize music access across the Upper Valley. We believe talent is 
+              universal, but opportunity is not. Our job is to close that gap—one 
+              instrument at a time.
+            </p>
+            <Link href="/about" className="kc-btn kc-btn--outline">
+              Read Our Story
+            </Link>
+          </div>
+        </div>
       </div>
-      <div className={`kc-story__text-wrap${textVisible ? ' visible' : ''}`} ref={textRef}>
-        <RevealOnScroll direction="right" distance={30}>
-          <h2 className="kc-story__heading">Our Story</h2>
-        </RevealOnScroll>
-        <SlideInText direction="right" distance={50} blur>
-          <p className="kc-story__intro">
-            Ansh and Jason noticed a growing gap between students who could access music education
-            and those who could not, and they decided to do something about it. They founded Key
-            Change, a student-led initiative that collects instruments, music supplies, and donations,
-            then connects them with schools and students who need them most.
-          </p>
-        </SlideInText>
-        <SlideInText direction="left" distance={50} delay={0.15} blur>
-          <p className="kc-story__body">
-            Their mission is simple and powerful: to create a world where every student can experience
-            the joy of making music. Key Change provides instruments, funds lessons, and supports
-            programs that inspire young musicians. The organization also welcomes volunteers and donors,
-            inviting communities to join in bringing instruments, instruction, and musical opportunities
-            to students.
-          </p>
-        </SlideInText>
-        <SlideInText direction="right" distance={50} delay={0.3} blur>
-          <p className="kc-story__body">
-            Since its founding, Key Change has focused on practical, sustainable impact—repairing and
-            refurbishing donated instruments, matching resources to school needs, and building
-            partnerships with educators to ensure students get both tools and guidance. By harnessing
-            the energy and empathy of students, Key Change aims not only to fill a resource gap but to
-            spark lasting musical journeys for kids who might otherwise be left out.
-          </p>
-        </SlideInText>
-        <Link href="/about" className="kc-btn kc-btn--outline">Learn More</Link>
-      </div>
-      <ScrollChevron />
     </section>
   )
 }
 
-/* ── Social Gallery ── */
-const GALLERY = [
-  { src: '/assets/microphone.webp', alt: 'Microphone',  note: '♩' },
-  { src: '/assets/guitarra.webp',   alt: 'Guitar',      note: '♪' },
-  { src: '/assets/music-stand.webp', alt: 'Music stand', note: '♫' },
-  { src: '/assets/drums.webp',       alt: 'Drum kit',    note: '♬' },
-]
-
-function GalleryItem({ item, index }) {
+/* ── Gallery Section ──
+   Visual proof of impact
+*/
+function GallerySection() {
   const [ref, visible] = useReveal({ threshold: 0.1 })
+  
   return (
-    <a
-      href="https://instagram.com/keychangeproject/"
-      target="_blank"
-      rel="noopener"
-      className="kc-social__item"
-      ref={ref}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'scale(1)' : 'scale(0.95)',
-        transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`,
-      }}
-    >
-      <img src={item.src} alt={item.alt} />
-      <div className="kc-social__overlay">
-        <span className="kc-social__overlay-icon">{item.note}</span>
+    <section ref={ref} className="kc-section kc-section--dark kc-gallery">
+      <div className="kc-container">
+        <div className={`kc-gallery__header ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+          <h2>Every instrument<br />tells a story</h2>
+          <p>From donated guitars to refurbished keyboards, each piece carries potential.</p>
+        </div>
+        
+        <div className={`kc-gallery__grid ${visible ? 'kc-stagger visible' : 'kc-stagger'}`}>
+          <div className="kc-gallery__item kc-gallery__item--large">
+            <img src="/assets/microphone.webp" alt="Microphone" />
+          </div>
+          <div className="kc-gallery__item">
+            <img src="/assets/guitarra.webp" alt="Guitar" />
+          </div>
+          <div className="kc-gallery__item">
+            <img src="/assets/drums.webp" alt="Drums" />
+          </div>
+          <div className="kc-gallery__item kc-gallery__item--wide">
+            <img src="/assets/music-stand.webp" alt="Music stand" />
+          </div>
+        </div>
+        
+        <div className={`kc-gallery__cta ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+          <a 
+            href="https://instagram.com/keychangeproject/" 
+            target="_blank" 
+            rel="noopener"
+            className="kc-btn kc-btn--outline"
+          >
+            Follow our journey
+          </a>
+        </div>
       </div>
-    </a>
-  )
-}
-
-function SocialSection() {
-  const [headRef, headVisible] = useReveal()
-
-  return (
-    <section className="kc-section kc-social">
-      <h2 className={`kc-social__heading kc-reveal${headVisible ? ' visible' : ''}`} ref={headRef}>
-        Follow Us on Social
-      </h2>
-      <div className="kc-social__grid">
-        {GALLERY.map((item, i) => (
-          <GalleryItem key={i} item={item} index={i} />
-        ))}
-      </div>
-      <div className="kc-social__cta">
-        <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener" className="kc-btn kc-btn--outline">
-          Follow on Instagram
-        </a>
-      </div>
-      <ScrollChevron />
     </section>
   )
 }
 
-/* ── Contact Section ── */
+/* ── Contact Section ──
+   Clean human-designed form
+*/
 function ContactSection() {
-  const [leftRef, leftVisible] = useReveal()
-  const [rightRef, rightVisible] = useReveal()
+  const [ref, visible] = useReveal({ threshold: 0.1 })
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
 
@@ -337,10 +248,12 @@ function ContactSection() {
       email: [v => validateRequired(v, 'Email'), validateEmail],
       message: [v => validateRequired(v, 'Message')],
     })
+    
     if (validationErrors) {
       setErrors(validationErrors)
       return
     }
+    
     setErrors({})
     setStatus('submitting')
 
@@ -361,59 +274,108 @@ function ContactSection() {
   }
 
   return (
-    <section className="kc-section kc-contact" style={{ position: 'relative' }}>
-      <WaveEffect color="rgba(245,197,24,0.03)" layers={3} height={120} style={{ position: 'absolute', top: 0, left: 0, right: 0 }} />
-      <div className="kc-contact__inner">
-        <div className={`kc-contact__left${leftVisible ? ' visible' : ''}`} ref={leftRef}>
-          <h2 className="kc-contact__heading">Contact Us</h2>
-          <p className="kc-contact__sub">
-            Interested in working together or having a burning question? Tell us a bit about yourself
-            and we&apos;ll get back to you soon. We can&apos;t wait to hear from you!
-          </p>
-        </div>
-        <div className={`kc-contact__right${rightVisible ? ' visible' : ''}`} ref={rightRef}>
-          <div className="kc-glass kc-glass--gold">
+    <section ref={ref} className="kc-section kc-section--alt kc-contact">
+      <div className="kc-container">
+        <div className={`kc-contact__grid ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+          <div className="kc-contact__info">
+            <span className="kc-contact__eyebrow">Get in touch</span>
+            <h2>Let&apos;s make music<br />together</h2>
+            <p>
+              Have an instrument to donate? Want to volunteer? 
+              Just curious? We&apos;d love to hear from you.
+            </p>
+            <div className="kc-contact__details">
+              <div>
+                <strong>Email</strong>
+                <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
+              </div>
+              <div>
+                <strong>Instagram</strong>
+                <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">
+                  @keychangeproject
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div className="kc-contact__form-wrapper">
             {status === 'success' ? (
               <FormSuccess
-                variant="quiet"
-                title="Message sent!"
-                message="We'll be in touch soon."
+                title="Message sent"
+                message="Thanks for reaching out. We'll get back to you within 48 hours."
               />
             ) : (
               <form onSubmit={handleSubmit} className="kc-form">
                 <div className="kc-form__row">
                   <div className="kc-form__field">
-                    <label className="kc-form__label">First Name <span className="kc-form__req">(required)</span></label>
-                    <input type="text" name="first_name" required placeholder="First" className={errors.first_name ? 'error' : ''} />
+                    <label className="kc-form__label">
+                      First Name <span>(required)</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      name="first_name" 
+                      placeholder="Jane"
+                      className={errors.first_name ? 'error' : ''} 
+                    />
                     {errors.first_name && <span className="kc-form__error">{errors.first_name}</span>}
                   </div>
                   <div className="kc-form__field">
-                    <label className="kc-form__label">Last Name <span className="kc-form__req">(required)</span></label>
-                    <input type="text" name="last_name" required placeholder="Last" className={errors.last_name ? 'error' : ''} />
+                    <label className="kc-form__label">
+                      Last Name <span>(required)</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      name="last_name" 
+                      placeholder="Smith"
+                      className={errors.last_name ? 'error' : ''} 
+                    />
                     {errors.last_name && <span className="kc-form__error">{errors.last_name}</span>}
                   </div>
                 </div>
+                
                 <div className="kc-form__field">
-                  <label className="kc-form__label">Email <span className="kc-form__req">(required)</span></label>
-                  <input type="email" name="email" required placeholder="your@email.com" className={errors.email ? 'error' : ''} />
+                  <label className="kc-form__label">
+                    Email <span>(required)</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="jane@example.com"
+                    className={errors.email ? 'error' : ''} 
+                  />
                   {errors.email && <span className="kc-form__error">{errors.email}</span>}
                 </div>
+                
                 <label className="kc-checkbox">
                   <input type="checkbox" name="newsletter" value="yes" />
-                  <span>Sign up for news and updates</span>
+                  <span>Keep me updated on Key Change news</span>
                 </label>
+                
                 <div className="kc-form__field">
-                  <label className="kc-form__label">Message <span className="kc-form__req">(required)</span></label>
-                  <textarea name="message" rows="5" required placeholder="Tell us about yourself..." className={errors.message ? 'error' : ''} />
+                  <label className="kc-form__label">
+                    Message <span>(required)</span>
+                  </label>
+                  <textarea 
+                    name="message" 
+                    rows={5} 
+                    placeholder="Tell us how you'd like to help..."
+                    className={errors.message ? 'error' : ''} 
+                  />
                   {errors.message && <span className="kc-form__error">{errors.message}</span>}
                 </div>
+                
                 {status === 'error' && (
                   <div className="kc-form__status kc-form__status--error" role="alert">
                     Something went wrong. Please try again.
                   </div>
                 )}
-                <button type="submit" className="kc-btn kc-btn--gold kc-btn--full" disabled={status === 'submitting'}>
-                  {status === 'submitting' ? 'Sending…' : 'Send Message'}
+                
+                <button 
+                  type="submit" 
+                  className="kc-btn kc-btn--primary kc-btn--full"
+                  disabled={status === 'submitting'}
+                >
+                  {status === 'submitting' ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}
@@ -424,15 +386,15 @@ function ContactSection() {
   )
 }
 
-/* ── Home page ── */
+/* ── Home Page ── */
 export default function Home() {
   return (
     <>
       <HeroSection />
-      <StatSection />
+      <ImpactSection />
       <HowItWorks />
       <StorySection />
-      <SocialSection />
+      <GallerySection />
       <ContactSection />
     </>
   )

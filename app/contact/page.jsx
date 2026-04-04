@@ -1,28 +1,85 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import FormSuccess from '../../components/FormSuccess'
-import ScrollChevron from '../../components/ScrollChevron'
-import FAQ from '../../components/FAQ'
 import { useReveal } from '../../hooks/useReveal'
 import { validateEmail, validateRequired, validateForm } from '../../lib/validate'
-import WaveEffect from '../../components/animations/WaveEffect'
-import GlassCard from '../../components/animations/GlassCard'
-import MagneticButton from '../../components/animations/MagneticButton'
-import NeonGlow from '../../components/animations/NeonGlow'
 
-const CONTACT_FAQ = [
-  { q: 'How long does it take to get a response?', a: 'We typically respond to all messages within 48 hours. If your matter is urgent, please mention that in your message.' },
-  { q: 'How can I donate instruments?', a: 'Head over to our Donate page to fill out a donation form. We accept all types of instruments in any condition.' },
-  { q: 'Can I volunteer with Key Change?', a: 'Absolutely! Visit our Get Involved page to learn about volunteer roles and fill out an application.' },
-  { q: 'Where is Key Change based?', a: 'We are based in the Upper Valley area of New Hampshire and Vermont, primarily serving the Hanover and Norwich communities.' },
-  { q: 'Is Key Change a registered nonprofit?', a: 'We are a student-led initiative working toward official nonprofit status. Contact us for the latest information.' },
+const FAQ_ITEMS = [
+  {
+    question: 'How long does it take to get a response?',
+    answer: 'We typically respond to all messages within 48 hours. For urgent matters, please indicate that in your message subject.'
+  },
+  {
+    question: 'How can I donate instruments?',
+    answer: 'Head to our Donate page to fill out a simple form with details about your instrument. We accept all types in any condition—even if they need repair.'
+  },
+  {
+    question: 'Can I volunteer with Key Change?',
+    answer: 'Absolutely. We need help with instrument collection, cleaning, minor repairs, and outreach. Visit our Get Involved page to learn more.'
+  },
+  {
+    question: 'Where is Key Change based?',
+    answer: 'We are based in the Upper Valley area of New Hampshire and Vermont, primarily serving the Hanover and Norwich communities and surrounding towns.'
+  },
+  {
+    question: 'Do you accept monetary donations?',
+    answer: 'Yes. Financial contributions help us cover repair costs, purchase accessories like cases and strings, and fund lesson scholarships for students.'
+  }
 ]
+
+function FAQItem({ question, answer, isOpen, onClick }) {
+  return (
+    <div className="kc-faq__item">
+      <button 
+        className="kc-faq__question"
+        onClick={onClick}
+        aria-expanded={isOpen}
+      >
+        <span>{question}</span>
+        <span className={`kc-faq__icon ${isOpen ? 'kc-faq__icon--open' : ''}`}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      <div className={`kc-faq__answer ${isOpen ? 'kc-faq__answer--open' : ''}`}>
+        <p>{answer}</p>
+      </div>
+    </div>
+  )
+}
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState(null)
+  const [ref, visible] = useReveal({ threshold: 0.1 })
+  
+  return (
+    <section ref={ref} className="kc-section">
+      <div className="kc-container kc-container--narrow">
+        <div className={`kc-faq ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+          <h2 className="kc-faq__title">Frequently Asked Questions</h2>
+          <div className="kc-faq__list">
+            {FAQ_ITEMS.map((item, index) => (
+              <FAQItem
+                key={index}
+                question={item.question}
+                answer={item.answer}
+                isOpen={openIndex === index}
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export default function Contact() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
-  const [infoRef, infoVisible] = useReveal({ threshold: 0.1 })
-  const [faqRef, faqVisible] = useReveal({ threshold: 0.1 })
+  const [ref, visible] = useReveal({ threshold: 0.1 })
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -40,10 +97,12 @@ export default function Contact() {
       email: [v => validateRequired(v, 'Email'), validateEmail],
       message: [v => validateRequired(v, 'Message')],
     })
+    
     if (validationErrors) {
       setErrors(validationErrors)
       return
     }
+    
     setErrors({})
     setStatus('submitting')
 
@@ -57,8 +116,12 @@ export default function Contact() {
           source: 'Contact Page',
         }),
       })
-      if (res.ok) { setStatus('success'); e.target.reset() }
-      else setStatus('error')
+      if (res.ok) { 
+        setStatus('success')
+        e.target.reset() 
+      } else {
+        setStatus('error')
+      }
     } catch {
       setStatus('error')
     }
@@ -66,87 +129,107 @@ export default function Contact() {
 
   return (
     <>
-      <section className="kc-page-hero">
-        <ScrollChevron />
+      {/* Header */}
+      <section className="kc-page-header">
         <div className="kc-container">
-          <h1><NeonGlow color="#F5C518" intensity={0.4} mode="text" duration={3}>Contact Us</NeonGlow></h1>
+          <h1>Contact Us</h1>
           <p>
-            Have a question, want to get involved, or just want to say hello? Fill out the form below
-            and we&apos;ll get back to you as soon as we can.
+            Have a question about donating? Want to volunteer? Just want to say hello? 
+            Drop us a line and we&apos;ll get back to you within 48 hours.
           </p>
         </div>
       </section>
 
       {/* Contact Info Cards */}
-      <section className={`kc-section kc-reveal${infoVisible ? ' visible' : ''}`} ref={infoRef} style={{ background: 'var(--color-surface)' }}>
-        <div className="kc-container" style={{ maxWidth: '800px' }}>
-          <div className="kc-contact-info kc-stagger">
-            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 0 }}>
-              <div className="kc-contact-info__icon">✉️</div>
-              <div className="kc-contact-info__title">Email</div>
-              <div className="kc-contact-info__value">
-                <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
-              </div>
-            </GlassCard>
-            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 1 }}>
-              <div className="kc-contact-info__icon">📍</div>
-              <div className="kc-contact-info__title">Location</div>
-              <div className="kc-contact-info__value">Upper Valley, NH &amp; VT</div>
-            </GlassCard>
-            <GlassCard blur={14} opacity={0.06} hover className="kc-contact-info__card" style={{ '--i': 2 }}>
-              <div className="kc-contact-info__icon">📷</div>
-              <div className="kc-contact-info__title">Instagram</div>
-              <div className="kc-contact-info__value">
-                <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">@keychangeproject</a>
-              </div>
-            </GlassCard>
+      <section className="kc-section kc-section--alt">
+        <div className="kc-container">
+          <div className="kc-contact-page__info">
+            <div className="kc-contact-page__card">
+              <span className="kc-contact-page__label">Email</span>
+              <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
+            </div>
+            <div className="kc-contact-page__card">
+              <span className="kc-contact-page__label">Instagram</span>
+              <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">
+                @keychangeproject
+              </a>
+            </div>
+            <div className="kc-contact-page__card">
+              <span className="kc-contact-page__label">Location</span>
+              <span>Upper Valley, NH & VT</span>
+            </div>
           </div>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
-            We typically respond within 48 hours.
-          </p>
         </div>
       </section>
 
       {/* Contact Form */}
-      <section className="kc-section">
-        <div className="kc-container" style={{ maxWidth: '640px' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>Send Us a Message</h2>
-          <div className="kc-glass kc-glass--gold">
+      <section ref={ref} className="kc-section">
+        <div className="kc-container kc-container--narrow">
+          <div className={`kc-contact-page__form ${visible ? 'kc-reveal visible' : 'kc-reveal'}`}>
+            <h2>Send us a message</h2>
+            
             {status === 'success' ? (
               <FormSuccess
-                variant="quiet"
-                title="Message sent!"
+                title="Message sent"
                 message="Thanks for reaching out. We'll get back to you within 48 hours."
               />
             ) : (
               <form onSubmit={handleSubmit} className="kc-form">
                 <div className="kc-form__row">
                   <div className="kc-form__field">
-                    <label className="kc-form__label">First Name <span className="kc-form__req">(required)</span></label>
-                    <input type="text" name="first_name" required className={errors.first_name ? 'error' : ''} />
+                    <label className="kc-form__label">
+                      First Name <span>(required)</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      name="first_name"
+                      placeholder="Jane"
+                      className={errors.first_name ? 'error' : ''} 
+                    />
                     {errors.first_name && <span className="kc-form__error">{errors.first_name}</span>}
                   </div>
                   <div className="kc-form__field">
-                    <label className="kc-form__label">Last Name <span className="kc-form__req">(required)</span></label>
-                    <input type="text" name="last_name" required className={errors.last_name ? 'error' : ''} />
+                    <label className="kc-form__label">
+                      Last Name <span>(required)</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      name="last_name"
+                      placeholder="Smith"
+                      className={errors.last_name ? 'error' : ''} 
+                    />
                     {errors.last_name && <span className="kc-form__error">{errors.last_name}</span>}
                   </div>
                 </div>
 
                 <div className="kc-form__field">
-                  <label className="kc-form__label">Email <span className="kc-form__req">(required)</span></label>
-                  <input type="email" name="email" required className={errors.email ? 'error' : ''} />
+                  <label className="kc-form__label">
+                    Email <span>(required)</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    name="email"
+                    placeholder="jane@example.com"
+                    className={errors.email ? 'error' : ''} 
+                  />
                   {errors.email && <span className="kc-form__error">{errors.email}</span>}
                 </div>
 
                 <label className="kc-checkbox">
                   <input type="checkbox" name="newsletter" value="yes" />
-                  <span>Sign up for news and updates</span>
+                  <span>Keep me updated on Key Change news</span>
                 </label>
 
                 <div className="kc-form__field">
-                  <label className="kc-form__label">Message <span className="kc-form__req">(required)</span></label>
-                  <textarea name="message" rows="5" required className={errors.message ? 'error' : ''} />
+                  <label className="kc-form__label">
+                    Message <span>(required)</span>
+                  </label>
+                  <textarea 
+                    name="message" 
+                    rows={5}
+                    placeholder="Tell us how we can help..."
+                    className={errors.message ? 'error' : ''} 
+                  />
                   {errors.message && <span className="kc-form__error">{errors.message}</span>}
                 </div>
 
@@ -155,26 +238,22 @@ export default function Contact() {
                     Something went wrong. Please try again.
                   </div>
                 )}
-                <MagneticButton as="div" strength={0.25}>
-                  <button type="submit" className="kc-btn kc-btn--gold kc-btn--full" disabled={status === 'submitting'}>
-                    {status === 'submitting' ? 'Submitting…' : 'Send Message'}
-                  </button>
-                </MagneticButton>
+
+                <button 
+                  type="submit" 
+                  className="kc-btn kc-btn--primary kc-btn--full"
+                  disabled={status === 'submitting'}
+                >
+                  {status === 'submitting' ? 'Sending...' : 'Send Message'}
+                </button>
               </form>
             )}
           </div>
         </div>
       </section>
 
-      {/* Wave divider */}
-      <WaveEffect color="rgba(245,197,24,0.04)" layers={3} height={140} />
-
       {/* FAQ */}
-      <section className={`kc-section kc-reveal${faqVisible ? ' visible' : ''}`} ref={faqRef} style={{ background: 'var(--color-surface)' }}>
-        <div className="kc-container">
-          <FAQ title="Frequently Asked Questions" items={CONTACT_FAQ} />
-        </div>
-      </section>
+      <FAQSection />
     </>
   )
 }

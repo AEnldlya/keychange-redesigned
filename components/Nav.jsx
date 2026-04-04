@@ -6,11 +6,13 @@ import { usePathname } from 'next/navigation'
 export default function Nav() {
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const lastScrollY = useRef(0)
   const pathname = usePathname()
 
-  useEffect(() => { setMenuOpen(false) }, [pathname])
+  useEffect(() => { 
+    setMobileOpen(false) 
+  }, [pathname])
 
   useEffect(() => {
     let ticking = false
@@ -19,10 +21,10 @@ export default function Nav() {
       ticking = true
       requestAnimationFrame(() => {
         const y = window.scrollY
-        setScrolled(y > 80)
-        if (y > 80) {
-          if (y > lastScrollY.current + 5) setHidden(true)
-          else if (y < lastScrollY.current - 5) setHidden(false)
+        setScrolled(y > 50)
+        if (y > 100) {
+          if (y > lastScrollY.current + 10) setHidden(true)
+          else if (y < lastScrollY.current - 10) setHidden(false)
         } else {
           setHidden(false)
         }
@@ -34,56 +36,44 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const bars = [
-    menuOpen ? { transform: 'translateY(9px) rotate(45deg)' } : {},
-    menuOpen ? { opacity: 0 } : {},
-    menuOpen ? { transform: 'translateY(-9px) rotate(-45deg)' } : {},
+  const navLinks = [
+    { href: '/about', label: 'About' },
+    { href: '/get-involved', label: 'Get Involved' },
+    { href: '/donate', label: 'Donate' },
+    { href: '/contact', label: 'Contact' },
   ]
 
   return (
-    <nav className={`kc-nav${hidden ? ' hidden' : ''}${scrolled ? ' scrolled' : ''}`}>
+    <nav className={`kc-nav ${scrolled ? 'kc-nav--scrolled' : ''} ${hidden ? 'kc-nav--hidden' : ''}`}>
       <div className="kc-nav__inner">
         <Link href="/" className="kc-nav__logo">
-          <img src="/assets/logo.svg" alt="Key Change" className="kc-nav__logo-img" />
+          Key Change
         </Link>
+        
         <ul className="kc-nav__links">
-          <li><Link href="/about">About</Link></li>
-          <li><Link href="/get-involved">Get Involved</Link></li>
-          <li><Link href="/donate">Donate</Link></li>
-          <li><Link href="/contact">Contact</Link></li>
-          <li>
-            <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener" aria-label="Instagram" className="kc-nav__icon-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                <circle cx="12" cy="12" r="4"/>
-                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-              </svg>
-            </a>
-          </li>
-          <li>
-            <a href="mailto:keychange.team@gmail.com" aria-label="Email" className="kc-nav__icon-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <polyline points="2,4 12,13 22,4"/>
-              </svg>
-            </a>
-          </li>
+          {navLinks.map(link => (
+            <li key={link.href}>
+              <Link href={link.href}>{link.label}</Link>
+            </li>
+          ))}
         </ul>
+        
         <button
-          className="kc-nav__hamburger"
-          onClick={() => setMenuOpen(o => !o)}
-          aria-label="Menu"
-          aria-expanded={menuOpen}
+          className="kc-nav__mobile-toggle"
+          onClick={() => setMobileOpen(o => !o)}
+          aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
         >
-          <span style={bars[0]} /><span style={bars[1]} /><span style={bars[2]} />
+          <span style={{ transform: mobileOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+          <span style={{ opacity: mobileOpen ? 0 : 1 }} />
+          <span style={{ transform: mobileOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
         </button>
       </div>
-      <div className={`kc-nav__mobile${menuOpen ? ' open' : ''}`}>
-        <Link href="/about">About</Link>
-        <Link href="/get-involved">Get Involved</Link>
-        <Link href="/donate">Donate</Link>
-        <Link href="/contact">Contact</Link>
-        <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
+      
+      <div className={`kc-nav__mobile ${mobileOpen ? 'kc-nav__mobile--open' : ''}`}>
+        {navLinks.map(link => (
+          <Link key={link.href} href={link.href}>{link.label}</Link>
+        ))}
       </div>
     </nav>
   )

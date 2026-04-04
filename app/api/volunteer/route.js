@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
-import { addNewsletterContact } from '../../../lib/airtable'
 
-const BASE_URL = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Volunteers`
+// Submit to Key Change Submissions table via Maton gateway
+const AIRTABLE_BASE_ID = 'appS0Nfve0Di8jeKp'
+const AIRTABLE_TABLE_ID = 'tblcpqpSso2IeAr6p'
+const MATON_GATEWAY_URL = `https://gateway.maton.ai/airtable/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
 
 const HELP_LABELS = {
   collection: 'Instrument collection or donation outreach',
@@ -27,11 +29,23 @@ export async function POST(req) {
       help_types, availability, why_volunteer, anything_else,
     } = await req.json()
 
-    const res = await fetch(BASE_URL, {
+    // Build volunteer details as a formatted message
+    const volunteerDetails = [
+      age_grade_school && `Age/Grade/School: ${age_grade_school}`,
+      city && state && `Location: ${city}, ${state}`,
+      contact_method && `Best Contact: ${CONTACT_METHOD_LABELS[contact_method] || contact_method}`,
+      help_types?.length && `Interested In: ${help_types.map(v => HELP_LABELS[v] || v).join(', ')}`,
+      availability && `Availability: ${availability}`,
+      why_volunteer && `Why Volunteer: ${why_volunteer}`,
+      anything_else && `Other Info: ${anything_else}`,
+    ].filter(Boolean).join('\n\n')
+
+    const res = await fetch(MATON_GATEWAY_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        'Authorization': `Bearer ${process.env.MATON_API_KEY}`,
         'Content-Type': 'application/json',
+        'Maton-Connection': 'e2e40838-4a68-4916-94e4-38b4e82f513a',
       },
       body: JSON.stringify({
         fields: {
@@ -40,14 +54,10 @@ export async function POST(req) {
           'Email': email,
           'Newsletter': Boolean(newsletter),
           'Phone': phone || '',
-          'Age / Grade / School': age_grade_school,
-          'State': state,
-          'City': city,
-          'Best Contact Method': CONTACT_METHOD_LABELS[contact_method] || contact_method,
-          'Help Interests': (help_types || []).map(v => HELP_LABELS[v] || v),
-          'Availability': availability,
-          'Why Volunteer': why_volunteer,
-          'Anything Else': anything_else || '',
+          'City': city || '',
+          'State': state || '',
+          'Message': volunteerDetails || '',
+          'Source': 'Volunteer Form',
           'Submitted At': new Date().toISOString(),
         },
       }),
@@ -57,10 +67,6 @@ export async function POST(req) {
       const err = await res.text()
       console.error('Airtable error:', err)
       return NextResponse.json({ error: 'Airtable error' }, { status: 500 })
-    }
-
-    if (newsletter) {
-      addNewsletterContact({ first_name, last_name, email, source: 'Volunteer Form' })
     }
 
     return NextResponse.json({ ok: true })

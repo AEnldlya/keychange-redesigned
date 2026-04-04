@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
-import { addNewsletterContact } from '../../../lib/airtable'
 
-const BASE_URL = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Donations`
+// Submit to Key Change Submissions table via Maton gateway
+const AIRTABLE_BASE_ID = 'appS0Nfve0Di8jeKp'
+const AIRTABLE_TABLE_ID = 'tblcpqpSso2IeAr6p'
+const MATON_GATEWAY_URL = `https://gateway.maton.ai/airtable/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
 
 export async function POST(req) {
   try {
@@ -24,45 +26,45 @@ export async function POST(req) {
       instrumentPhotoUrl = blob.url
     }
 
-    const fields = {
-      'First Name': first_name,
-      'Last Name': last_name,
-      'Organization': organization || '',
-      'Email': email,
-      'Newsletter': Boolean(newsletter),
-      'Phone': phone,
-      'City': city,
-      'State': state,
-      'Donation Description': donation_description,
-      'Condition': condition,
-      'Can Drop Off': can_dropoff,
-      'Alt Location': alt_location || '',
-      'Drop-off Time': dropoff_time,
-      'Other Info': other_info || '',
-      'Submitted At': new Date().toISOString(),
-    }
+    // Build donation details as a formatted message
+    const donationDetails = [
+      donation_description && `Donation: ${donation_description}`,
+      condition && `Condition: ${condition}`,
+      can_dropoff && `Can Drop Off: ${can_dropoff}`,
+      alt_location && `Alt Location: ${alt_location}`,
+      dropoff_time && `Preferred Time: ${dropoff_time}`,
+      other_info && `Additional Info: ${other_info}`,
+      instrumentPhotoUrl && `Photo: ${instrumentPhotoUrl}`,
+    ].filter(Boolean).join('\n\n')
 
-    if (instrumentPhotoUrl) {
-      fields['Instrument Photo'] = [{ url: instrumentPhotoUrl }]
-    }
-
-    const res = await fetch(BASE_URL, {
+    const res = await fetch(MATON_GATEWAY_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        'Authorization': `Bearer ${process.env.MATON_API_KEY}`,
         'Content-Type': 'application/json',
+        'Maton-Connection': 'e2e40838-4a68-4916-94e4-38b4e82f513a',
       },
-      body: JSON.stringify({ fields }),
+      body: JSON.stringify({
+        fields: {
+          'First Name': first_name,
+          'Last Name': last_name,
+          'Email': email,
+          'Newsletter': Boolean(newsletter),
+          'Phone': phone || '',
+          'City': city || '',
+          'State': state || '',
+          'Organization': organization || '',
+          'Message': donationDetails || '',
+          'Source': 'Donate Form',
+          'Submitted At': new Date().toISOString(),
+        },
+      }),
     })
 
     if (!res.ok) {
       const err = await res.text()
       console.error('Airtable error:', err)
       return NextResponse.json({ error: 'Airtable error' }, { status: 500 })
-    }
-
-    if (newsletter) {
-      addNewsletterContact({ first_name, last_name, email, source: 'Donate Form' })
     }
 
     return NextResponse.json({ ok: true })

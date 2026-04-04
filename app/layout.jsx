@@ -3,7 +3,6 @@ import Nav from '../components/Nav'
 import Footer from '../components/Footer'
 import PasswordGate from '../components/PasswordGate'
 import ScrollToTop from '../components/ScrollToTop'
-import ScrollProgress from '../components/ScrollProgress'
 
 const PASSWORD_ENABLED = process.env.NEXT_PUBLIC_PASSWORD_ENABLED === 'true'
 
@@ -35,7 +34,6 @@ function SiteShell({ children }) {
   return (
     <>
       <ScrollToTop />
-      <ScrollProgress />
       <a href="#main" className="skip-link">Skip to content</a>
       <Nav />
       <main id="main">{children}</main>
