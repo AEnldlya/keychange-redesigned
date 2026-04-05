@@ -6,6 +6,7 @@ import { Upload, CheckCircle, ArrowRight, Info } from 'lucide-react'
 export default function DonatePage() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
   const [imagePreview, setImagePreview] = useState(null)
 
   function handleImageChange(e) {
@@ -66,6 +67,7 @@ export default function DonatePage() {
     }
 
     setErrors({})
+    setSubmitError('')
     setStatus('submitting')
 
     try {
@@ -74,9 +76,18 @@ export default function DonatePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      setStatus(res.ok ? 'success' : 'error')
+      const body = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setStatus('success')
+      } else {
+        setStatus('error')
+        setSubmitError(
+          body.error || 'Something went wrong. Please try again.'
+        )
+      }
     } catch {
       setStatus('error')
+      setSubmitError('Something went wrong. Please try again.')
     }
   }
 
@@ -332,7 +343,7 @@ export default function DonatePage() {
                       className="form-error"
                       style={{ marginBottom: '1rem' }}
                     >
-                      Something went wrong. Please try again.
+                      {submitError || 'Something went wrong. Please try again.'}
                     </div>
                   )}
 

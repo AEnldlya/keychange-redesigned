@@ -268,6 +268,7 @@ function ContactSection() {
   const [ref, isVisible] = useScrollReveal(0.1)
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -292,6 +293,7 @@ function ContactSection() {
     }
 
     setErrors({})
+    setSubmitError('')
     setStatus('submitting')
 
     try {
@@ -300,9 +302,18 @@ function ContactSection() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, source: 'Home Page' }),
       })
-      setStatus(res.ok ? 'success' : 'error')
+      const body = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setStatus('success')
+      } else {
+        setStatus('error')
+        setSubmitError(
+          body.error || 'Something went wrong. Please try again.'
+        )
+      }
     } catch {
       setStatus('error')
+      setSubmitError('Something went wrong. Please try again.')
     }
   }
 
@@ -415,7 +426,7 @@ function ContactSection() {
 
                 {status === 'error' && (
                   <div className="form-error" style={{ marginBottom: '1rem' }}>
-                    Something went wrong. Please try again.
+                    {submitError || 'Something went wrong. Please try again.'}
                   </div>
                 )}
 

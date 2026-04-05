@@ -6,6 +6,7 @@ import { CheckCircle, ArrowRight, Users, Calendar, Heart } from 'lucide-react'
 export default function GetInvolvedPage() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
   const [helpTypes, setHelpTypes] = useState([])
 
   function toggleHelpType(type) {
@@ -45,6 +46,7 @@ export default function GetInvolvedPage() {
     }
 
     setErrors({})
+    setSubmitError('')
     setStatus('submitting')
 
     try {
@@ -53,9 +55,18 @@ export default function GetInvolvedPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      setStatus(res.ok ? 'success' : 'error')
+      const body = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setStatus('success')
+      } else {
+        setStatus('error')
+        setSubmitError(
+          body.error || 'Something went wrong. Please try again.'
+        )
+      }
     } catch {
       setStatus('error')
+      setSubmitError('Something went wrong. Please try again.')
     }
   }
 
@@ -325,7 +336,7 @@ export default function GetInvolvedPage() {
                       className="form-error"
                       style={{ marginBottom: '1rem' }}
                     >
-                      Something went wrong. Please try again.
+                      {submitError || 'Something went wrong. Please try again.'}
                     </div>
                   )}
 

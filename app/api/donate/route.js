@@ -6,6 +6,7 @@ import {
   conditionSelectLabel,
   canDropOffSelectLabel,
 } from '@/lib/airtableFieldNames'
+import { nextJsonFromAirtableResponse } from '@/lib/airtableHttpError'
 
 export async function POST(req) {
   try {
@@ -30,12 +31,29 @@ export async function POST(req) {
 
     let instrumentPhotoUrl = null
     if (image_base64 && image_filename) {
-      const buffer = Buffer.from(image_base64, 'base64')
-      const blob = await put(`donations/${Date.now()}-${image_filename}`, buffer, {
-        access: 'public',
-        contentType: image_filename.match(/\.png$/i) ? 'image/png' : 'image/jpeg',
-      })
-      instrumentPhotoUrl = blob.url
+      try {
+        const buffer = Buffer.from(image_base64, 'base64')
+        const blob = await put(
+          `donations/${Date.now()}-${image_filename}`,
+          buffer,
+          {
+            access: 'public',
+            contentType: image_filename.match(/\.png$/i)
+              ? 'image/png'
+              : 'image/jpeg',
+          }
+        )
+        instrumentPhotoUrl = blob.url
+      } catch (blobErr) {
+        console.error('Blob upload error:', blobErr)
+        return NextResponse.json(
+          {
+            error:
+              'Could not upload your photo. Add BLOB_READ_WRITE_TOKEN in Vercel, or submit without a photo.',
+          },
+          { status: 500 }
+        )
+      }
     }
 
     const { submittedAt } = airtableFieldNames()
@@ -69,16 +87,7 @@ export async function POST(req) {
 
     const res = await createAirtableRecord(fields)
 
-    if (!res.ok) {
-      const err = await res.text()
-      console.error('Airtable error:', err)
-      const status = res.status === 503 ? 503 : 500
-      const message =
-        res.status === 503
-          ? 'Server missing Airtable/Maton credentials'
-          : 'Airtable error'
-      return NextResponse.json({ error: message }, { status })
-    }
+    if (!res.ok) return nextJsonFromAirtableResponse(res)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

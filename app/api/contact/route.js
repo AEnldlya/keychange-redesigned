@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAirtableRecord } from '@/lib/airtableSubmit'
 import { airtableFieldNames } from '@/lib/airtableFieldNames'
+import { nextJsonFromAirtableResponse } from '@/lib/airtableHttpError'
 
 export async function POST(req) {
   try {
@@ -20,16 +21,7 @@ export async function POST(req) {
 
     const res = await createAirtableRecord(fields)
 
-    if (!res.ok) {
-      const err = await res.text()
-      console.error('Airtable error:', err)
-      const status = res.status === 503 ? 503 : 500
-      const messageErr =
-        res.status === 503
-          ? 'Server missing Airtable/Maton credentials'
-          : 'Airtable error'
-      return NextResponse.json({ error: messageErr }, { status })
-    }
+    if (!res.ok) return nextJsonFromAirtableResponse(res)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

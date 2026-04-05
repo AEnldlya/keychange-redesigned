@@ -6,6 +6,7 @@ import { Mail, MapPin, CheckCircle, ArrowRight } from 'lucide-react'
 export default function ContactPage() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -30,6 +31,7 @@ export default function ContactPage() {
     }
 
     setErrors({})
+    setSubmitError('')
     setStatus('submitting')
 
     try {
@@ -38,9 +40,18 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, source: 'Contact Page' }),
       })
-      setStatus(res.ok ? 'success' : 'error')
+      const body = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setStatus('success')
+      } else {
+        setStatus('error')
+        setSubmitError(
+          body.error || 'Something went wrong. Please try again.'
+        )
+      }
     } catch {
       setStatus('error')
+      setSubmitError('Something went wrong. Please try again.')
     }
   }
 
@@ -278,7 +289,7 @@ export default function ContactPage() {
                       className="form-error"
                       style={{ marginBottom: '1rem' }}
                     >
-                      Something went wrong. Please try again.
+                      {submitError || 'Something went wrong. Please try again.'}
                     </div>
                   )}
 
