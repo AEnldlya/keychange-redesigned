@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
-import { createAirtableRecord } from '@/lib/airtableSubmit'
+import { createAirtableRecord, AIRTABLE_TABLES } from '@/lib/airtableSubmit'
 import {
   airtableFieldNames,
   conditionSelectLabel,
@@ -85,7 +85,7 @@ export async function POST(req) {
       fields['Instrument Photo'] = [{ url: instrumentPhotoUrl }]
     }
 
-    const res = await createAirtableRecord(fields)
+    const res = await createAirtableRecord(fields, AIRTABLE_TABLES.donations)
 
     if (!res.ok) return nextJsonFromAirtableResponse(res)
 

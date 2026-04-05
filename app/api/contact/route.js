@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAirtableRecord } from '@/lib/airtableSubmit'
+import { createAirtableRecord, AIRTABLE_TABLES } from '@/lib/airtableSubmit'
 import { airtableFieldNames } from '@/lib/airtableFieldNames'
 import { nextJsonFromAirtableResponse } from '@/lib/airtableHttpError'
 
@@ -19,7 +19,7 @@ export async function POST(req) {
       [submittedAt]: new Date().toISOString(),
     }
 
-    const res = await createAirtableRecord(fields)
+    const res = await createAirtableRecord(fields, AIRTABLE_TABLES.contacts)
 
     if (!res.ok) return nextJsonFromAirtableResponse(res)
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAirtableRecord } from '@/lib/airtableSubmit'
+import { createAirtableRecord, AIRTABLE_TABLES } from '@/lib/airtableSubmit'
 import {
   airtableFieldNames,
   volunteerContactMethodLabel,
@@ -52,7 +52,7 @@ export async function POST(req) {
       fields['Help Interests'] = helpInterests
     }
 
-    const res = await createAirtableRecord(fields)
+    const res = await createAirtableRecord(fields, AIRTABLE_TABLES.volunteers)
 
     if (!res.ok) return nextJsonFromAirtableResponse(res)
 
