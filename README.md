@@ -42,7 +42,7 @@ Use **one table** with columns that match what the API sends (names are **case-s
 - **Condition:** `Excellent - Like new`, `Good - Minor wear, fully playable`, `Fair - Needs some repair`, `Poor - Significant repair needed`, `Unknown - Not sure`
 - **Can Drop Off:** `Yes, I can drop off`, `No, I need pickup`, `Not sure yet`
 
-**Volunteer** sends the same core fields as contact plus `Phone`, `City`, `State`, and puts details in `Message`.
+**Volunteer (Get Involved)** sends: `First Name`, `Last Name`, `Email`, `Newsletter`, `Phone`, `Age/Grade/School`, `State`, `City`, `Best Contact Method` (single select: **`Email`**, **`Phone`**, **`Text`**), `Help Interests` (**multi-select** — add these options exactly: `Instrument collection or donation outreach`, `Social media or marketing`, `School/organization outreach`, `Event support`, `Instrument cleaning or quality checks`, `Pickup or delivery`, `General volunteer help`), `Availability`, `Why Volunteer`, `Anything Else`, `Submitted At`.
 
 Do **not** include a `Source` column unless you add it yourself and extend the API — it was removed because it caused “unknown field” errors.
 

@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createAirtableRecord } from '@/lib/airtableSubmit'
-import { airtableFieldNames } from '@/lib/airtableFieldNames'
-
-const HELP_LABELS = {
-  collection: 'Instrument collection or donation outreach',
-  social_media: 'Social media or marketing',
-  outreach: 'School/organization outreach',
-  events: 'Event support',
-  cleaning: 'Instrument cleaning or quality checks',
-  delivery: 'Pickup or delivery',
-  general: 'General volunteer help',
-}
-
-const CONTACT_METHOD_LABELS = {
-  email: 'Email',
-  phone: 'Phone',
-  text: 'Text',
-}
+import {
+  airtableFieldNames,
+  volunteerContactMethodLabel,
+  volunteerHelpInterestsForAirtable,
+} from '@/lib/airtableFieldNames'
 
 export async function POST(req) {
   try {
@@ -36,33 +24,34 @@ export async function POST(req) {
       anything_else,
     } = await req.json()
 
-    const volunteerDetails = [
-      age_grade_school && `Age/Grade/School: ${age_grade_school}`,
-      city && state && `Location: ${city}, ${state}`,
-      contact_method &&
-        `Best Contact: ${CONTACT_METHOD_LABELS[contact_method] || contact_method}`,
-      help_types?.length &&
-        `Interested In: ${help_types.map((v) => HELP_LABELS[v] || v).join(', ')}`,
-      availability && `Availability: ${availability}`,
-      why_volunteer && `Why Volunteer: ${why_volunteer}`,
-      anything_else && `Other Info: ${anything_else}`,
-    ]
-      .filter(Boolean)
-      .join('\n\n')
+    const { submittedAt } = airtableFieldNames()
+    const bestContact = volunteerContactMethodLabel(contact_method)
+    const helpInterests = volunteerHelpInterestsForAirtable(help_types)
 
-    const { submittedAt, message: messageField } = airtableFieldNames()
-
-    const res = await createAirtableRecord({
+    const fields = {
       'First Name': first_name,
       'Last Name': last_name,
       Email: email,
       Newsletter: Boolean(newsletter),
       Phone: phone || '',
-      City: city || '',
+      'Age/Grade/School': age_grade_school || '',
       State: state || '',
-      [messageField]: volunteerDetails || '',
+      City: city || '',
+      Availability: availability || '',
+      'Why Volunteer': why_volunteer || '',
+      'Anything Else': anything_else || '',
       [submittedAt]: new Date().toISOString(),
-    })
+    }
+
+    if (bestContact) {
+      fields['Best Contact Method'] = bestContact
+    }
+
+    if (helpInterests.length > 0) {
+      fields['Help Interests'] = helpInterests
+    }
+
+    const res = await createAirtableRecord(fields)
 
     if (!res.ok) {
       const err = await res.text()
