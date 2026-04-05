@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAirtableRecord } from '@/lib/airtableSubmit'
+import { airtableFieldNames } from '@/lib/airtableFieldNames'
 
 const HELP_LABELS = {
   collection: 'Instrument collection or donation outreach',
@@ -49,6 +50,8 @@ export async function POST(req) {
       .filter(Boolean)
       .join('\n\n')
 
+    const { submittedAt, message: messageField } = airtableFieldNames()
+
     const res = await createAirtableRecord({
       'First Name': first_name,
       'Last Name': last_name,
@@ -57,9 +60,8 @@ export async function POST(req) {
       Phone: phone || '',
       City: city || '',
       State: state || '',
-      Message: volunteerDetails || '',
-      Source: 'Volunteer Form',
-      'Submitted At': new Date().toISOString(),
+      [messageField]: volunteerDetails || '',
+      [submittedAt]: new Date().toISOString(),
     })
 
     if (!res.ok) {

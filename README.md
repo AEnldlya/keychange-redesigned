@@ -31,6 +31,23 @@ RESEND_API_KEY=            # Resend API key (if you send email from API routes)
 
 Form submissions go to Airtable via `lib/airtableSubmit.js`. If `AIRTABLE_PAT` is unset, the app falls back to `MATON_API_KEY` + Maton gateway (legacy).
 
+### Airtable table setup
+
+Use **one table** with columns that match what the API sends (names are **case-sensitive**).
+
+**Contact** sends: `First Name`, `Last Name`, `Email`, `Newsletter` (checkbox), `Message`, `Submitted At` (use a **Date** or **Date and time** field, or single line text — not a read-only “Created time” field unless you omit writes to it).
+
+**Donate** adds: `Organization`, `Phone`, `City`, `State`, `Donation Description` (long text), `Condition` (single select), `Can Drop Off` (single select), `Alt Location`, `Drop-off Time`, `Other Info` (long text), `Instrument Photo` (attachments). Add these **exact** single-select options in Airtable:
+
+- **Condition:** `Excellent - Like new`, `Good - Minor wear, fully playable`, `Fair - Needs some repair`, `Poor - Significant repair needed`, `Unknown - Not sure`
+- **Can Drop Off:** `Yes, I can drop off`, `No, I need pickup`, `Not sure yet`
+
+**Volunteer** sends the same core fields as contact plus `Phone`, `City`, `State`, and puts details in `Message`.
+
+Do **not** include a `Source` column unless you add it yourself and extend the API — it was removed because it caused “unknown field” errors.
+
+If your `Message` or `Submitted At` column is named differently, set `AIRTABLE_FIELD_MESSAGE` / `AIRTABLE_FIELD_SUBMITTED_AT` in Vercel.
+
 ### 3. Run the dev server
 
 ```bash

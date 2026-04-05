@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
 import { createAirtableRecord } from '@/lib/airtableSubmit'
+import {
+  airtableFieldNames,
+  conditionSelectLabel,
+  canDropOffSelectLabel,
+} from '@/lib/airtableFieldNames'
 
 export async function POST(req) {
   try {
@@ -33,31 +38,36 @@ export async function POST(req) {
       instrumentPhotoUrl = blob.url
     }
 
-    const donationDetails = [
-      donation_description && `Donation: ${donation_description}`,
-      condition && `Condition: ${condition}`,
-      can_dropoff && `Can Drop Off: ${can_dropoff}`,
-      alt_location && `Alt Location: ${alt_location}`,
-      dropoff_time && `Preferred Time: ${dropoff_time}`,
-      other_info && `Additional Info: ${other_info}`,
-      instrumentPhotoUrl && `Photo: ${instrumentPhotoUrl}`,
-    ]
-      .filter(Boolean)
-      .join('\n\n')
+    const { submittedAt } = airtableFieldNames()
+    const conditionLabel = conditionSelectLabel(condition)
+    const dropOffLabel = canDropOffSelectLabel(can_dropoff)
 
-    const res = await createAirtableRecord({
+    const fields = {
       'First Name': first_name,
       'Last Name': last_name,
       Email: email,
       Newsletter: Boolean(newsletter),
       Phone: phone || '',
+      Organization: organization || '',
       City: city || '',
       State: state || '',
-      Organization: organization || '',
-      Message: donationDetails || '',
-      Source: 'Donate Form',
-      'Submitted At': new Date().toISOString(),
-    })
+      'Donation Description': donation_description || '',
+      Condition: conditionLabel,
+      'Alt Location': alt_location || '',
+      'Drop-off Time': dropoff_time || '',
+      'Other Info': other_info || '',
+      [submittedAt]: new Date().toISOString(),
+    }
+
+    if (dropOffLabel) {
+      fields['Can Drop Off'] = dropOffLabel
+    }
+
+    if (instrumentPhotoUrl) {
+      fields['Instrument Photo'] = [{ url: instrumentPhotoUrl }]
+    }
+
+    const res = await createAirtableRecord(fields)
 
     if (!res.ok) {
       const err = await res.text()
