@@ -19,14 +19,17 @@ npm install
 
 ### 2. Configure environment variables
 
-Create a `.env.local` file in the project root:
+Create a `.env.local` file in the project root (see `.env.example`):
 
 ```env
-BLOB_READ_WRITE_TOKEN=     # Vercel Blob token (store must have public access enabled)
-AIRTABLE_BASE_ID=          # Airtable base ID (found in API docs)
-AIRTABLE_API_KEY=          # Airtable personal access token
-RESEND_API_KEY=            # Resend API key
+AIRTABLE_PAT=              # Airtable personal access token (recommended; or use AIRTABLE_API_KEY)
+AIRTABLE_BASE_ID=appS0Nfve0Di8jeKp
+AIRTABLE_TABLE_ID=tblcpqpSso2IeAr6p
+BLOB_READ_WRITE_TOKEN=    # Vercel Blob — donate form photos (public access on the store)
+RESEND_API_KEY=            # Resend API key (if you send email from API routes)
 ```
+
+Form submissions go to Airtable via `lib/airtableSubmit.js`. If `AIRTABLE_PAT` is unset, the app falls back to `MATON_API_KEY` + Maton gateway (legacy).
 
 ### 3. Run the dev server
 
