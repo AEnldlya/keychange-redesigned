@@ -10,15 +10,16 @@
 /* CSS VARIABLES */
 /* ───────────────────────────────────────────────────────────── */
 :root {
-  --color-cream: #F5F0EB;
-  --color-cream-dark: #EDE6DE;
-  --color-ink: #1A1A1A;
-  --color-ink-light: #4A4A4A;
-  --color-ink-muted: #6B6B6B;
-  --color-terracotta: #C65D3B;
-  --color-terracotta-dark: #A84D2F;
+  --color-cream: #EDF2FB;
+  --color-cream-dark: #D7E3FC;
+  --color-ink: #1B2A4A;
+  --color-ink-light: #34506E;
+  --color-ink-muted: #6081A9;
+  --color-terracotta: #4A86D4;
+  --color-terracotta-dark: #3A6DB5;
   --color-white: #FFFFFF;
   --color-error: #DC2626;
+  --color-accent: #F0D422;
   
   --font-display: 'Plein', sans-serif;
   --font-body: 'Epilogue', sans-serif;
@@ -46,7 +47,7 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  --shadow-terracotta: 0 4px 14px rgba(198, 93, 59, 0.25);
+  --shadow-terracotta: 0 4px 14px rgba(74, 134, 212, 0.25);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -85,8 +86,8 @@ button { cursor: pointer; border: none; background: none; }
 
 /* BUTTONS */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-4) var(--space-8); font-family: var(--font-body); font-size: 1rem; font-weight: 600; border-radius: 4px; transition: all var(--transition-base); }
-.btn-primary { background-color: var(--color-terracotta); color: var(--color-white); box-shadow: var(--shadow-sm); }
-.btn-primary:hover { background-color: var(--color-terracotta-dark); transform: translateY(-2px); box-shadow: var(--shadow-terracotta); }
+.btn-primary { background-color: var(--color-accent); color: var(--color-ink); font-weight: 700; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background-color: #DCC11E; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(240, 212, 34, 0.35); }
 .btn-secondary { background-color: transparent; color: var(--color-terracotta); border: 1.5px solid var(--color-terracotta); }
 .btn-secondary:hover { background-color: var(--color-terracotta); color: var(--color-white); }
 
@@ -110,7 +111,7 @@ button { cursor: pointer; border: none; background: none; }
 .form-success p { color: var(--color-ink-light); }
 
 /* NAVIGATION */
-.nav { position: sticky; top: 0; z-index: 100; background-color: rgba(245, 240, 235, 0.95); backdrop-filter: blur(8px); border-bottom: 1px solid transparent; transition: border-color var(--transition-base); }
+.nav { position: sticky; top: 0; z-index: 100; background-color: rgba(237, 242, 251, 0.95); backdrop-filter: blur(8px); border-bottom: 1px solid transparent; transition: border-color var(--transition-base); }
 .nav-scrolled { border-color: var(--color-cream-dark); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-6); }
 .nav-logo { display: flex; align-items: center; gap: var(--space-3); font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink); }
@@ -131,13 +132,13 @@ button { cursor: pointer; border: none; background: none; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-12); max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-6); }
 .footer-brand { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; }
 .footer-brand img { width: 32px; height: 32px; filter: invert(1); }
-.footer-tagline { font-size: 0.875rem; line-height: 1.7; color: rgba(245, 240, 235, 0.7); max-width: 280px; }
+.footer-tagline { font-size: 0.875rem; line-height: 1.7; color: rgba(237, 242, 251, 0.7); max-width: 280px; }
 .footer-heading { font-family: var(--font-display); font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-4); color: var(--color-cream); }
 .footer-links { display: flex; flex-direction: column; gap: var(--space-3); }
-.footer-links a { font-size: 0.875rem; color: rgba(245, 240, 235, 0.7); transition: color var(--transition-fast); }
+.footer-links a { font-size: 0.875rem; color: rgba(237, 242, 251, 0.7); transition: color var(--transition-fast); }
 .footer-links a:hover { color: var(--color-cream); }
-.footer-bottom { display: flex; justify-content: space-between; align-items: center; max-width: var(--max-width); margin: var(--space-12) auto 0; padding: var(--space-6) var(--space-6) 0; border-top: 1px solid rgba(245, 240, 235, 0.1); }
-.footer-bottom p { font-size: 0.75rem; color: rgba(245, 240, 235, 0.5); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; max-width: var(--max-width); margin: var(--space-12) auto 0; padding: var(--space-6) var(--space-6) 0; border-top: 1px solid rgba(237, 242, 251, 0.1); }
+.footer-bottom p { font-size: 0.75rem; color: rgba(237, 242, 251, 0.5); }
 @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); } .footer-bottom { flex-direction: column; gap: var(--space-2); text-align: center; } }
 @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
 
@@ -157,7 +158,7 @@ button { cursor: pointer; border: none; background: none; }
 /* IMPACT */
 .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-16); align-items: center; }
 .impact-stat { background-color: var(--color-white); padding: var(--space-10); border-radius: 8px; text-align: center; box-shadow: var(--shadow-lg); }
-.impact-number { display: block; font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; color: var(--color-terracotta); line-height: 1; margin-bottom: var(--space-4); }
+.impact-number { display: block; font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; color: var(--color-terracotta); line-height: 1; margin-bottom: var(--space-4); text-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .impact-label { font-size: 1.125rem; font-weight: 600; color: var(--color-ink); margin-bottom: var(--space-2); }
 .impact-source { font-size: 0.75rem; color: var(--color-ink-muted); }
 .impact-content h2 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.1; margin-bottom: var(--space-6); }
