@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
-
   const isHome = pathname === '/'
 
   useEffect(() => { setMobileOpen(false) }, [pathname])
@@ -21,14 +21,13 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  /* Transparent mode: only on home, before scroll */
   const transparent = isHome && !scrolled && !mobileOpen
 
-  const navLinks = [
-    { href: '/about', label: 'About' },
+  const links = [
+    { href: '/about',        label: 'About' },
     { href: '/get-involved', label: 'Get Involved' },
-    { href: '/donate', label: 'Donate' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/donate',       label: 'Donate' },
+    { href: '/contact',      label: 'Contact' },
   ]
 
   return (
@@ -37,67 +36,82 @@ export default function Nav() {
       style={{
         position: isHome ? 'fixed' : 'sticky',
         top: 0,
-        zIndex: 100,
-        width: '100%',
-        background: transparent
-          ? 'transparent'
-          : 'rgba(237,242,251,0.96)',
-        borderBottom: transparent ? 'none' : '1px solid var(--color-cream-dark)',
-        backdropFilter: transparent ? 'none' : 'blur(10px)',
-        transition: 'background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease',
+        background: transparent ? 'transparent' : 'rgba(244,241,236,0.96)',
+        borderBottom: transparent ? 'none' : '1px solid rgba(15,25,35,0.08)',
+        backdropFilter: transparent ? 'none' : 'blur(12px)',
       }}
     >
       <div className="nav-inner">
-        <Link href="/" className="nav-logo" style={{ color: transparent ? '#fff' : 'var(--color-ink)' }}>
+        <Link
+          href="/"
+          className="nav-logo"
+          style={{ color: transparent ? '#fff' : 'var(--ink)' }}
+        >
           <img
             src="/assets/logo.svg"
             alt=""
-            style={{ filter: transparent ? 'invert(1) brightness(2)' : 'none', transition: 'filter 0.35s ease' }}
+            style={{ filter: transparent ? 'invert(1) brightness(2)' : 'none', transition: 'filter 0.3s ease' }}
           />
-          <span>Key Change</span>
+          Key Change
         </Link>
 
-        <div className="nav-links" style={{ '--link-color': transparent ? 'rgba(255,255,255,0.85)' : 'var(--color-ink-light)' }}>
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              style={{
-                color: pathname === link.href
-                  ? (transparent ? '#fff' : 'var(--color-terracotta)')
-                  : (transparent ? 'rgba(255,255,255,0.82)' : 'var(--color-ink-light)'),
-                fontWeight: pathname === link.href ? 700 : 500,
-              }}
-            >
-              {link.label}
-            </Link>
+        <div className="nav-links">
+          {links.map((l) => (
+            <motion.div key={l.href} whileHover={{ y: -1 }} transition={{ duration: 0.15 }}>
+              <Link
+                href={l.href}
+                style={{
+                  color: pathname === l.href
+                    ? (transparent ? '#fff' : 'var(--blue)')
+                    : (transparent ? 'rgba(255,255,255,0.8)' : 'var(--ink-2)'),
+                  fontWeight: pathname === l.href ? 600 : 500,
+                }}
+              >
+                {l.label}
+              </Link>
+            </motion.div>
           ))}
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }}>
+            <Link href="/donate" className="btn btn-blue" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
+              Donate
+            </Link>
+          </motion.div>
         </div>
 
         <button
           className="nav-mobile-toggle"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-          style={{ color: transparent ? '#fff' : 'var(--color-ink)' }}
+          style={{ color: transparent ? '#fff' : 'var(--ink)' }}
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {mobileOpen && (
-        <div className="nav-mobile nav-mobile-open">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              style={{ fontWeight: pathname === link.href ? 700 : 500, color: pathname === link.href ? 'var(--color-terracotta)' : 'var(--color-ink)' }}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className="nav-mobile nav-mobile-open"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                style={{
+                  color: pathname === l.href ? 'var(--blue)' : 'var(--ink)',
+                  fontWeight: pathname === l.href ? 700 : 500,
+                }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   )
 }
