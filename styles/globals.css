@@ -354,35 +354,55 @@ button { cursor: pointer; border: none; background: none; }
 .form-group { margin-bottom: var(--sp-6); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
 @media (max-width: 580px) { .form-row { grid-template-columns: 1fr; } }
-.form-label { display: block; margin-bottom: var(--sp-2); font-size: 0.8125rem; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.06em; }
-.form-label span { color: rgba(255,255,255,0.35); font-weight: 400; text-transform: none; }
+
+/* ── Default forms: LIGHT background ── */
+.form-label { display: block; margin-bottom: var(--sp-2); font-size: 0.8125rem; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
+.form-label span { color: var(--ink-3); font-weight: 400; }
 .form-input, .form-textarea {
   width: 100%; padding: var(--sp-3) 0;
-  font-size: 1rem; color: var(--white);
+  font-size: 1rem; color: var(--ink);
   background: transparent; border: none;
-  border-bottom: 1.5px solid rgba(255,255,255,0.2);
+  border-bottom: 1.5px solid var(--border);
   transition: border-color var(--base);
 }
-.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.25); }
-.form-input:focus, .form-textarea:focus { outline: none; border-bottom-color: var(--white); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--ink-3); }
+.form-input:focus, .form-textarea:focus { outline: none; border-bottom-color: var(--blue); }
 .form-input.error, .form-textarea.error { border-bottom-color: var(--error); }
 .form-textarea { min-height: 120px; resize: vertical; }
-.form-error { display: block; margin-top: var(--sp-2); font-size: 0.8125rem; color: #F87171; }
+.form-error { display: block; margin-top: var(--sp-2); font-size: 0.8125rem; color: var(--error); }
 .form-checkbox { display: flex; align-items: flex-start; gap: var(--sp-3); margin-bottom: var(--sp-6); cursor: pointer; }
 .form-checkbox input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
-.form-checkbox span { font-size: 0.875rem; color: rgba(255,255,255,0.55); }
+.form-checkbox span { font-size: 0.875rem; color: var(--ink-2); }
+.form-select { width: 100%; padding: var(--sp-3) 0; font-size: 1rem; color: var(--ink); background: transparent; border: none; border-bottom: 1.5px solid var(--border); transition: border-color var(--base); }
+.form-select:focus { outline: none; border-bottom-color: var(--blue); }
 .form-submit {
   display: block; width: 100%; padding: var(--sp-4) var(--sp-8);
-  background: var(--white); color: var(--ink);
+  background: var(--blue); color: var(--white);
   font-family: var(--font-body); font-size: 0.9375rem; font-weight: 700;
   border: none; border-radius: var(--radius); cursor: pointer;
   transition: all var(--base);
 }
-.form-submit:hover:not(:disabled) { background: var(--bg); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.form-submit:hover:not(:disabled) { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(43,92,230,0.3); }
 .form-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 .form-success { text-align: center; padding: var(--sp-12); }
-.form-success h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--white); margin-bottom: var(--sp-3); }
-.form-success p { color: rgba(255,255,255,0.6); }
+.form-success h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--ink); margin-bottom: var(--sp-3); }
+.form-success p { color: var(--ink-2); }
+
+/* ── .form-dark: override for forms on dark backgrounds ── */
+.form-dark .form-label { color: rgba(255,255,255,0.7); }
+.form-dark .form-label span { color: rgba(255,255,255,0.35); }
+.form-dark .form-input, .form-dark .form-textarea {
+  color: var(--white);
+  border-bottom-color: rgba(255,255,255,0.2);
+}
+.form-dark .form-input::placeholder, .form-dark .form-textarea::placeholder { color: rgba(255,255,255,0.28); }
+.form-dark .form-input:focus, .form-dark .form-textarea:focus { border-bottom-color: rgba(255,255,255,0.8); }
+.form-dark .form-checkbox span { color: rgba(255,255,255,0.55); }
+.form-dark .form-error { color: #F87171; }
+.form-dark .form-submit { background: var(--white); color: var(--ink); }
+.form-dark .form-submit:hover:not(:disabled) { background: var(--bg); }
+.form-dark .form-success h3 { color: var(--white); }
+.form-dark .form-success p { color: rgba(255,255,255,0.6); }
 
 /* ════════════════════════════════════════════════
    FOOTER

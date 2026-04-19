@@ -341,7 +341,7 @@ export default function GetInvolvedPage() {
 
                   <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn btn-blue"
                     style={{ width: '100%' }}
                     disabled={status === 'submitting'}
                   >

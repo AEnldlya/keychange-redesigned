@@ -290,8 +290,8 @@ function MissionReveal() {
 function StatsSection() {
   const stats = [
     { value: 36, suffix: 'M', label: 'Students without music access', note: 'Source: 2019 NAEP' },
-    { value: 100, suffix: '+', label: 'Instruments donated', note: 'And counting' },
-    { value: 5, suffix: '+', label: 'Partner schools', note: 'Upper Valley, NH & VT' },
+    { value: 2025, suffix: '', label: 'Year founded', note: 'Upper Valley, NH' },
+    { value: 0, suffix: '', label: 'Cost to receive an instrument', note: 'Always free for students' },
   ]
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
@@ -424,7 +424,7 @@ function StorySection() {
           >
             <div className="story-img-wrap">
               <img src="/assets/guitarra.webp" alt="Guitar" />
-              <div className="story-badge">Est. 2022</div>
+              <div className="story-badge">Est. 2025</div>
             </div>
           </motion.div>
 
@@ -600,7 +600,7 @@ function ContactSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-70px' }}
             transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="contact-form-box"
+            className="contact-form-box form-dark"
           >
             <AnimatePresence mode="wait">
               {status === 'success' ? (
