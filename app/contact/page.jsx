@@ -1,7 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Mail, MapPin, CheckCircle, ArrowRight } from 'lucide-react'
+
+function Reveal({ children, delay = 0, className = '', y = 36 }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-70px' })
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 export default function ContactPage() {
   const [status, setStatus] = useState('idle')
@@ -25,10 +42,7 @@ export default function ContactPage() {
     if (!data.email) newErrors.email = 'Email is required'
     if (!data.message) newErrors.message = 'Message is required'
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
 
     setErrors({})
     setSubmitError('')
@@ -45,9 +59,7 @@ export default function ContactPage() {
         setStatus('success')
       } else {
         setStatus('error')
-        setSubmitError(
-          body.error || 'Something went wrong. Please try again.'
-        )
+        setSubmitError(body.error || 'Something went wrong. Please try again.')
       }
     } catch {
       setStatus('error')
@@ -57,260 +69,106 @@ export default function ContactPage() {
 
   return (
     <>
-      {/* Page Header */}
-      <div className="page-header">
-        <h1>Contact Us</h1>
-        <p>Have a question? We would love to hear from you.</p>
+      <div className="page-header-v2">
+        <Reveal><span className="eyebrow">Say Hello</span></Reveal>
+        <Reveal delay={0.08}><h1>Contact Us</h1></Reveal>
+        <Reveal delay={0.16}><p>Have a question? We would love to hear from you.</p></Reveal>
       </div>
 
-      {/* Contact Grid */}
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
-          <div className="contact-grid">
-            {/* Contact Info */}
-            <div className="contact-info" style={{ textAlign: 'left' }}>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.5rem',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                Get in touch
-              </h2>
-              <p
-                style={{
-                  fontSize: '1.125rem',
-                  color: 'var(--color-ink-light)',
-                  marginBottom: '2rem',
-                }}
-              >
-                Whether you have an instrument to donate, want to volunteer, or
-                just have a question, we are here to help.
-              </p>
+          <div className="contact2-grid">
+            <div className="contact2-info-light">
+              <Reveal><h2>Get in touch</h2></Reveal>
+              <Reveal delay={0.08}>
+                <p>Whether you have an instrument to donate, want to volunteer,
+                or just have a question, we are here to help.</p>
+              </Reveal>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1.5rem',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '1rem',
-                  }}
-                >
-                  <Mail
-                    size={24}
-                    style={{ color: 'var(--color-terracotta)', marginTop: '4px' }}
-                  />
+              <Reveal delay={0.16} className="contact-detail-list">
+                <div className="contact-detail-item">
+                  <Mail size={22} className="contact-detail-icon" />
                   <div>
-                    <strong
-                      style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: 'var(--color-ink-muted)',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
-                      Email
-                    </strong>
-                    <a
-                      href="mailto:keychange.team@gmail.com"
-                      style={{
-                        fontSize: '1.125rem',
-                        color: 'var(--color-terracotta)',
-                      }}
-                    >
-                      keychange.team@gmail.com
-                    </a>
+                    <strong>Email</strong>
+                    <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '1rem',
-                  }}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-terracotta)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '4px' }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                <div className="contact-detail-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="contact-detail-icon"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                   <div>
-                    <strong
-                      style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: 'var(--color-ink-muted)',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
-                      Instagram
-                    </strong>
-                    <a
-                      href="https://instagram.com/keychangeproject/"
-                      target="_blank"
-                      rel="noopener"
-                      style={{
-                        fontSize: '1.125rem',
-                        color: 'var(--color-terracotta)',
-                      }}
-                    >
-                      @keychangeproject
-                    </a>
+                    <strong>Instagram</strong>
+                    <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">@keychangeproject</a>
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '1rem',
-                  }}
-                >
-                  <MapPin
-                    size={24}
-                    style={{ color: 'var(--color-terracotta)', marginTop: '4px' }}
-                  />
+                <div className="contact-detail-item">
+                  <MapPin size={22} className="contact-detail-icon" />
                   <div>
-                    <strong
-                      style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: 'var(--color-ink-muted)',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
-                      Location
-                    </strong>
-                    <span style={{ fontSize: '1.125rem' }}>
-                      Upper Valley, NH & VT
-                    </span>
+                    <strong>Location</strong>
+                    <span>Upper Valley, NH & VT</span>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             </div>
 
-            {/* Contact Form */}
-            <div className="contact-form-wrapper">
-              {status === 'success' ? (
-                <div className="form-success">
-                  <CheckCircle
-                    size={64}
-                    style={{
-                      color: 'var(--color-terracotta)',
-                      marginBottom: '1.5rem',
-                    }}
-                  />
-                  <h3>Message sent</h3>
-                  <p>
-                    Thanks for reaching out. We will get back to you within 48
-                    hours.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit}>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">
-                        First Name <span>(required)</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="first_name"
-                        className={`form-input ${errors.first_name ? 'error' : ''}`}
-                        placeholder="Jane"
-                      />
-                      {errors.first_name && (
-                        <span className="form-error">{errors.first_name}</span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">
-                        Last Name <span>(required)</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="last_name"
-                        className={`form-input ${errors.last_name ? 'error' : ''}`}
-                        placeholder="Smith"
-                      />
-                      {errors.last_name && (
-                        <span className="form-error">{errors.last_name}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">
-                      Email <span>(required)</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      className={`form-input ${errors.email ? 'error' : ''}`}
-                      placeholder="jane@example.com"
-                    />
-                    {errors.email && (
-                      <span className="form-error">{errors.email}</span>
-                    )}
-                  </div>
-
-                  <label className="form-checkbox">
-                    <input type="checkbox" name="newsletter" value="yes" />
-                    <span>Keep me updated on Key Change news</span>
-                  </label>
-
-                  <div className="form-group">
-                    <label className="form-label">
-                      Message <span>(required)</span>
-                    </label>
-                    <textarea
-                      name="message"
-                      className={`form-textarea ${errors.message ? 'error' : ''}`}
-                      placeholder="How can we help you?"
-                      rows={5}
-                    />
-                    {errors.message && (
-                      <span className="form-error">{errors.message}</span>
-                    )}
-                  </div>
-
-                  {status === 'error' && (
-                    <div
-                      className="form-error"
-                      style={{ marginBottom: '1rem' }}
-                    >
-                      {submitError || 'Something went wrong. Please try again.'}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    style={{ width: '100%' }}
-                    disabled={status === 'submitting'}
+            <Reveal delay={0.1} className="contact2-form-wrap-light">
+              <AnimatePresence mode="wait">
+                {status === 'success' ? (
+                  <motion.div
+                    key="success"
+                    className="form-success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
                   >
-                    {status === 'submitting' ? (
-                      'Sending...'
-                    ) : (
-                      <>
-                        Send Message
-                        <ArrowRight size={18} />
-                      </>
+                    <CheckCircle size={56} style={{ color: 'var(--color-terracotta)', marginBottom: '1.5rem' }} />
+                    <h3>Message sent</h3>
+                    <p>Thanks for reaching out. We will get back to you within 48 hours.</p>
+                  </motion.div>
+                ) : (
+                  <motion.form key="form" onSubmit={handleSubmit}>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">First Name <span>(required)</span></label>
+                        <input type="text" name="first_name" className={`form-input ${errors.first_name ? 'error' : ''}`} placeholder="Jane" />
+                        {errors.first_name && <span className="form-error">{errors.first_name}</span>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Last Name <span>(required)</span></label>
+                        <input type="text" name="last_name" className={`form-input ${errors.last_name ? 'error' : ''}`} placeholder="Smith" />
+                        {errors.last_name && <span className="form-error">{errors.last_name}</span>}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Email <span>(required)</span></label>
+                      <input type="email" name="email" className={`form-input ${errors.email ? 'error' : ''}`} placeholder="jane@example.com" />
+                      {errors.email && <span className="form-error">{errors.email}</span>}
+                    </div>
+
+                    <label className="form-checkbox">
+                      <input type="checkbox" name="newsletter" value="yes" />
+                      <span>Keep me updated on Key Change news</span>
+                    </label>
+
+                    <div className="form-group">
+                      <label className="form-label">Message <span>(required)</span></label>
+                      <textarea name="message" className={`form-textarea ${errors.message ? 'error' : ''}`} placeholder="How can we help you?" rows={5} />
+                      {errors.message && <span className="form-error">{errors.message}</span>}
+                    </div>
+
+                    {status === 'error' && (
+                      <div className="form-error" style={{ marginBottom: '1rem' }}>
+                        {submitError || 'Something went wrong. Please try again.'}
+                      </div>
                     )}
-                  </button>
-                </form>
-              )}
-            </div>
+
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
+                      {status === 'submitting' ? 'Sending…' : <><span>Send Message</span><ArrowRight size={18} /></>}
+                    </button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </Reveal>
           </div>
         </div>
       </section>

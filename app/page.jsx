@@ -3,113 +3,196 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import {
+  motion,
+  useScroll,
+  useTransform,
+  useInView,
+  AnimatePresence,
+} from 'framer-motion'
+import {
   Music,
   Search,
   HandHeart,
   Play,
   ArrowRight,
   CheckCircle,
+  ArrowUpRight,
 } from 'lucide-react'
 
-function useScrollReveal(threshold = 0.1) {
+/* ─── Reveal wrapper ─── */
+function Reveal({ children, delay = 0, className = '', y = 40 }) {
   const ref = useRef(null)
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.unobserve(entry.target)
-        }
-      },
-      { threshold }
-    )
-
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
-
-    return () => observer.disconnect()
-  }, [threshold])
-
-  return [ref, isVisible]
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
 }
 
+/* ─── HERO — scroll-activated video ─── */
 function HeroSection() {
-  const [mounted, setMounted] = useState(false)
+  const containerRef = useRef(null)
+  const videoRef = useRef(null)
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  })
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.18])
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0.52, 0.88])
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '-22%'])
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    const video = videoRef.current
+    if (!video) return
+    const unsub = scrollYProgress.on('change', (v) => {
+      if (video.duration && isFinite(video.duration)) {
+        video.currentTime = v * video.duration
+      }
+    })
+    return () => unsub()
+  }, [scrollYProgress])
 
   return (
-    <section className="hero">
-      <div className="hero-content">
-        <div className="hero-text">
-          <span
-            className={`hero-eyebrow ${mounted ? 'animate-fade-in-up' : 'opacity-0'}`}
-          >
-            Student-Led Nonprofit
-          </span>
-          <h1
-            className={`hero-headline ${mounted ? 'animate-fade-in-up delay-100' : 'opacity-0'}`}
-          >
-            Music belongs to everyone
-          </h1>
-          <p
-            className={`hero-subhead ${mounted ? 'animate-fade-in-up delay-200' : 'opacity-0'}`}
-          >
-            3.6 million students in the US lack access to music education. We
-            collect unused instruments and put them in the hands of students who
-            need them most.
-          </p>
-          <div
-            className={`hero-cta ${mounted ? 'animate-fade-in-up delay-300' : 'opacity-0'}`}
-          >
-            <Link href="/get-involved" className="btn btn-primary">
-              Get Involved
-              <ArrowRight size={18} />
-            </Link>
-            <Link href="/donate" className="btn btn-secondary">
-              Donate an Instrument
-            </Link>
-          </div>
-        </div>
-        <div
-          className={`hero-image ${mounted ? 'animate-fade-in delay-200' : 'opacity-0'}`}
+    <section ref={containerRef} className="hero2">
+      {/* Parallax media layer */}
+      <motion.div className="hero2-media" style={{ scale }}>
+        {/* Place generated video at /public/assets/hero-video.mp4 */}
+        <video
+          ref={videoRef}
+          className="hero2-video"
+          src="/assets/hero-video.mp4"
+          muted
+          playsInline
+          preload="auto"
+        />
+        <img src="/assets/hero.webp" alt="" className="hero2-img" aria-hidden="true" />
+        <motion.div className="hero2-overlay" style={{ opacity: overlayOpacity }} />
+      </motion.div>
+
+      {/* Text layer */}
+      <motion.div className="hero2-body" style={{ y: textY, opacity: textOpacity }}>
+        <motion.span
+          className="hero2-eyebrow"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src="/assets/hero.webp" alt="Collection of musical instruments" />
-        </div>
+          Student-Led Nonprofit
+        </motion.span>
+
+        <motion.h1
+          className="hero2-headline"
+          initial={{ opacity: 0, y: 56 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Music belongs<br />to everyone
+        </motion.h1>
+
+        <motion.p
+          className="hero2-sub"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        >
+          3.6 million students in the US lack access to music education.
+          We collect unused instruments and put them in the hands of
+          students who need them most.
+        </motion.p>
+
+        <motion.div
+          className="hero2-actions"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Link href="/get-involved" className="btn2-primary">
+            Get Involved <ArrowUpRight size={17} />
+          </Link>
+          <Link href="/donate" className="btn2-ghost">
+            Donate an Instrument
+          </Link>
+        </motion.div>
+      </motion.div>
+
+      <div className="hero2-hint" aria-hidden="true">
+        <motion.span
+          animate={{ y: [0, 9, 0] }}
+          transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          ↓
+        </motion.span>
       </div>
     </section>
   )
 }
 
-function ImpactSection() {
-  const [ref, isVisible] = useScrollReveal(0.2)
-
+/* ─── TICKER ─── */
+function TickerBar() {
+  const items = [
+    '3.6M students without music education',
+    'Student-led · Upper Valley',
+    'Collect · Inspect · Match · Play',
+    'Donate your unused instrument',
+    'Every instrument tells a story',
+  ]
+  const doubled = [...items, ...items]
   return (
-    <section ref={ref} className="section section-alt">
+    <div className="ticker" aria-hidden="true">
+      <motion.div
+        className="ticker-track"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 24, ease: 'linear', repeat: Infinity }}
+      >
+        {doubled.map((item, i) => (
+          <span key={i} className="ticker-item">
+            {item}
+            <span className="ticker-sep">♪</span>
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  )
+}
+
+/* ─── IMPACT ─── */
+function ImpactSection() {
+  return (
+    <section className="section section-alt">
       <div className="container">
-        <div className="impact-grid">
-          <div className={`impact-stat ${isVisible ? 'animate-fade-in-up' : 'reveal'}`}>
-            <span className="impact-number">3.6M</span>
-            <p className="impact-label">Students without access to music education</p>
-            <span className="impact-source">Source: 2019 NAEP Arts Assessment</span>
-          </div>
-          <div className={`impact-content ${isVisible ? 'animate-fade-in-up delay-200' : 'reveal'}`}>
-            <h2>The gap is real</h2>
-            <p>
-              Budget cuts and rising instrument costs have left millions of
-              students on the sidelines. Schools cannot afford equipment.
-              Families cannot afford rentals. Meanwhile, thousands of
-              instruments sit unused in closets and attics.
-            </p>
-            <p>
-              We bridge that gap. Collecting, inspecting, and redistributing
-              instruments to students and programs that need them.
-            </p>
+        <div className="impact2-grid">
+          <Reveal className="impact2-stat" delay={0}>
+            <span className="impact2-num">3.6M</span>
+            <p className="impact2-label">Students without access to music education</p>
+            <span className="impact2-source">Source: 2019 NAEP Arts Assessment</span>
+          </Reveal>
+
+          <div className="impact2-copy">
+            <Reveal delay={0.1}><h2>The gap is real</h2></Reveal>
+            <Reveal delay={0.18}>
+              <p>
+                Budget cuts and rising instrument costs have left millions of
+                students on the sidelines. Schools cannot afford equipment.
+                Families cannot afford rentals. Meanwhile, thousands of
+                instruments sit unused in closets and attics.
+              </p>
+            </Reveal>
+            <Reveal delay={0.26}>
+              <p>
+                We bridge that gap — collecting, inspecting, and redistributing
+                instruments to students and programs that need them.
+              </p>
+            </Reveal>
           </div>
         </div>
       </div>
@@ -117,63 +200,36 @@ function ImpactSection() {
   )
 }
 
+/* ─── HOW IT WORKS ─── */
 function HowItWorks() {
-  const [ref, isVisible] = useScrollReveal(0.1)
-
   const steps = [
-    {
-      number: '01',
-      title: 'Collect',
-      description:
-        'We receive instrument donations from community members, schools, and music stores.',
-      icon: Music,
-    },
-    {
-      number: '02',
-      title: 'Inspect',
-      description:
-        'Each instrument is evaluated, cleaned, and prepared for its next musician.',
-      icon: Search,
-    },
-    {
-      number: '03',
-      title: 'Match',
-      description:
-        'We partner with schools to identify students who need instruments.',
-      icon: HandHeart,
-    },
-    {
-      number: '04',
-      title: 'Play',
-      description:
-        'Instruments go directly into students hands, ready to make music.',
-      icon: Play,
-    },
+    { number: '01', title: 'Collect', description: 'We receive instrument donations from community members, schools, and music stores.', icon: Music },
+    { number: '02', title: 'Inspect', description: 'Each instrument is evaluated, cleaned, and prepared for its next musician.', icon: Search },
+    { number: '03', title: 'Match', description: 'We partner with schools to identify students who need instruments.', icon: HandHeart },
+    { number: '04', title: 'Play', description: 'Instruments go directly into students hands, ready to make music.', icon: Play },
   ]
 
   return (
-    <section ref={ref} className="section">
+    <section className="section">
       <div className="container">
-        <div className={`how-header ${isVisible ? 'animate-fade-in-up' : 'reveal'}`}>
+        <Reveal className="how2-header">
           <h2>How it works</h2>
           <p>Four steps from donation to first notes</p>
-        </div>
-
-        <div className="how-grid">
+        </Reveal>
+        <div className="how2-grid">
           {steps.map((step, i) => (
-            <div
-              key={step.number}
-              className={`how-step ${isVisible ? 'animate-fade-in-up' : 'reveal'}`}
-              style={{ animationDelay: `${(i + 1) * 0.1}s` }}
-            >
-              <span className="how-number">{step.number}</span>
-              <step.icon
-                size={24}
-                style={{ color: 'var(--color-terracotta)', marginBottom: '1rem' }}
-              />
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
-            </div>
+            <Reveal key={step.number} delay={i * 0.09}>
+              <motion.div
+                className="how2-card"
+                whileHover={{ y: -6, boxShadow: '0 24px 48px rgba(0,0,0,0.1)' }}
+                transition={{ duration: 0.25 }}
+              >
+                <span className="how2-num">{step.number}</span>
+                <step.icon size={26} className="how2-icon" />
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -181,33 +237,40 @@ function HowItWorks() {
   )
 }
 
+/* ─── STORY ─── */
 function StorySection() {
-  const [ref, isVisible] = useScrollReveal(0.2)
-
   return (
-    <section ref={ref} className="section section-alt">
+    <section className="section section-alt">
       <div className="container">
-        <div className="story-grid">
-          <div className={`story-image ${isVisible ? 'animate-slide-left' : 'reveal'}`}>
-            <img src="/assets/guitarra.webp" alt="Guitar" />
-          </div>
-          <div className={`story-content ${isVisible ? 'animate-slide-right' : 'reveal'}`}>
-            <span className="story-eyebrow">Our Story</span>
-            <h2>Started by students, for students</h2>
-            <p>
-              Key Change began when two high schoolers noticed something wrong.
-              Their school had a thriving music program. Other schools just
-              miles away had nothing. The instruments existed. The students
-              existed. Only the connection was missing.
-            </p>
-            <p>
-              What started as a single instrument drive has grown into a
-              sustained effort to democratize music access across the Upper
-              Valley.
-            </p>
-            <Link href="/about" className="btn btn-secondary">
-              Read Our Story
-            </Link>
+        <div className="story2-grid">
+          <Reveal className="story2-media" y={60}>
+            <div className="story2-img-wrap">
+              <img src="/assets/guitarra.webp" alt="Guitar" />
+              <div className="story2-badge">Est. 2022</div>
+            </div>
+          </Reveal>
+          <div className="story2-copy">
+            <Reveal delay={0.05}><span className="eyebrow">Our Story</span></Reveal>
+            <Reveal delay={0.12}><h2>Started by students,<br />for students</h2></Reveal>
+            <Reveal delay={0.2}>
+              <p>
+                Key Change began when two high schoolers noticed something wrong.
+                Their school had a thriving music program. Other schools just
+                miles away had nothing. The instruments existed. The students
+                existed. Only the connection was missing.
+              </p>
+            </Reveal>
+            <Reveal delay={0.27}>
+              <p>
+                What started as a single instrument drive has grown into a
+                sustained effort to democratize music access across the Upper Valley.
+              </p>
+            </Reveal>
+            <Reveal delay={0.34}>
+              <Link href="/about" className="btn2-outline">
+                Read Our Story <ArrowRight size={16} />
+              </Link>
+            </Reveal>
           </div>
         </div>
       </div>
@@ -215,57 +278,55 @@ function StorySection() {
   )
 }
 
+/* ─── GALLERY ─── */
 function GallerySection() {
-  const [ref, isVisible] = useScrollReveal(0.1)
-
+  const photos = [
+    { src: '/assets/microphone.webp', alt: 'Microphone', cls: 'large' },
+    { src: '/assets/guitarra.webp', alt: 'Guitar', cls: 'normal' },
+    { src: '/assets/drums.webp', alt: 'Drums', cls: 'normal' },
+    { src: '/assets/music-stand.webp', alt: 'Music stand', cls: 'wide' },
+  ]
   return (
-    <section ref={ref} className="section">
+    <section className="section">
       <div className="container">
-        <div className={`gallery-header ${isVisible ? 'animate-fade-in-up' : 'reveal'}`}>
+        <Reveal className="gallery2-header">
           <h2>Every instrument tells a story</h2>
           <p>From donated guitars to refurbished keyboards, each piece carries potential.</p>
+        </Reveal>
+        <div className="gallery2-grid">
+          {photos.map((photo, i) => (
+            <Reveal
+              key={photo.src}
+              delay={i * 0.08}
+              className={`gallery2-item gallery2-${photo.cls}`}
+            >
+              <motion.div
+                className="gallery2-inner"
+                whileHover={{ scale: 1.04 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <img src={photo.src} alt={photo.alt} />
+              </motion.div>
+            </Reveal>
+          ))}
         </div>
-
-        <div className="gallery-grid">
-          <div
-            className={`gallery-item gallery-item-large ${isVisible ? 'animate-fade-in-up' : 'reveal'}`}
-          >
-            <img src="/assets/microphone.webp" alt="Microphone" />
-          </div>
-          <div
-            className={`gallery-item ${isVisible ? 'animate-fade-in-up delay-100' : 'reveal'}`}
-          >
-            <img src="/assets/guitarra.webp" alt="Guitar" />
-          </div>
-          <div
-            className={`gallery-item ${isVisible ? 'animate-fade-in-up delay-200' : 'reveal'}`}
-          >
-            <img src="/assets/drums.webp" alt="Drums" />
-          </div>
-          <div
-            className={`gallery-item gallery-item-wide ${isVisible ? 'animate-fade-in-up delay-300' : 'reveal'}`}
-          >
-            <img src="/assets/music-stand.webp" alt="Music stand" />
-          </div>
-        </div>
-
-        <div className={`gallery-cta ${isVisible ? 'animate-fade-in-up delay-400' : 'reveal'}`}>
+        <Reveal delay={0.3} className="gallery2-cta">
           <a
             href="https://instagram.com/keychangeproject/"
             target="_blank"
             rel="noopener"
-            className="btn btn-secondary"
+            className="btn2-outline"
           >
-            Follow our journey
+            Follow our journey <ArrowUpRight size={16} />
           </a>
-        </div>
+        </Reveal>
       </div>
     </section>
   )
 }
 
+/* ─── CONTACT ─── */
 function ContactSection() {
-  const [ref, isVisible] = useScrollReveal(0.1)
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState('')
@@ -287,10 +348,7 @@ function ContactSection() {
     if (!data.email) newErrors.email = 'Email is required'
     if (!data.message) newErrors.message = 'Message is required'
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
 
     setErrors({})
     setSubmitError('')
@@ -307,9 +365,7 @@ function ContactSection() {
         setStatus('success')
       } else {
         setStatus('error')
-        setSubmitError(
-          body.error || 'Something went wrong. Please try again.'
-        )
+        setSubmitError(body.error || 'Something went wrong. Please try again.')
       }
     } catch {
       setStatus('error')
@@ -318,139 +374,105 @@ function ContactSection() {
   }
 
   return (
-    <section ref={ref} className="section section-alt">
+    <section className="section section-dark">
       <div className="container">
-        <div className="contact-grid">
-          <div className={`contact-info ${isVisible ? 'animate-slide-left' : 'reveal'}`}>
-            <span className="story-eyebrow">Get in touch</span>
-            <h2>Lets make music together</h2>
-            <p>
-              Have an instrument to donate? Want to volunteer? Just curious?
-              We would love to hear from you.
-            </p>
-            <div className="contact-details">
-              <div>
-                <strong>Email</strong>
-                <a href="mailto:keychange.team@gmail.com">
-                  keychange.team@gmail.com
-                </a>
+        <div className="contact2-grid">
+          <div className="contact2-info">
+            <Reveal><span className="eyebrow eyebrow-light">Get in touch</span></Reveal>
+            <Reveal delay={0.08}><h2 className="contact2-heading">Let's make music<br />together</h2></Reveal>
+            <Reveal delay={0.16}>
+              <p className="contact2-desc">
+                Have an instrument to donate? Want to volunteer?
+                Just curious? We would love to hear from you.
+              </p>
+            </Reveal>
+            <Reveal delay={0.22}>
+              <div className="contact2-details">
+                <div>
+                  <strong>Email</strong>
+                  <a href="mailto:keychange.team@gmail.com">keychange.team@gmail.com</a>
+                </div>
+                <div>
+                  <strong>Instagram</strong>
+                  <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener">
+                    @keychangeproject
+                  </a>
+                </div>
               </div>
-              <div>
-                <strong>Instagram</strong>
-                <a
-                  href="https://instagram.com/keychangeproject/"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  @keychangeproject
-                </a>
-              </div>
-            </div>
+            </Reveal>
           </div>
 
-          <div className={`contact-form-wrapper ${isVisible ? 'animate-slide-right' : 'reveal'}`}>
-            {status === 'success' ? (
-              <div className="form-success">
-                <CheckCircle
-                  size={64}
-                  style={{ color: 'var(--color-terracotta)', marginBottom: '1.5rem' }}
-                />
-                <h3>Message sent</h3>
-                <p>Thanks for reaching out. We will get back to you within 48 hours.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">
-                      First Name <span>(required)</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="first_name"
-                      className={`form-input ${errors.first_name ? 'error' : ''}`}
-                      placeholder="Jane"
-                    />
-                    {errors.first_name && (
-                      <span className="form-error">{errors.first_name}</span>
-                    )}
+          <Reveal delay={0.1} className="contact2-form-wrap">
+            <AnimatePresence mode="wait">
+              {status === 'success' ? (
+                <motion.div
+                  key="success"
+                  className="form-success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <CheckCircle size={56} className="form-success-icon" />
+                  <h3>Message sent</h3>
+                  <p>Thanks for reaching out. We will get back to you within 48 hours.</p>
+                </motion.div>
+              ) : (
+                <motion.form key="form" onSubmit={handleSubmit} className="contact2-form">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">First Name <span>(required)</span></label>
+                      <input type="text" name="first_name" className={`form-input ${errors.first_name ? 'error' : ''}`} placeholder="Jane" />
+                      {errors.first_name && <span className="form-error">{errors.first_name}</span>}
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Last Name <span>(required)</span></label>
+                      <input type="text" name="last_name" className={`form-input ${errors.last_name ? 'error' : ''}`} placeholder="Smith" />
+                      {errors.last_name && <span className="form-error">{errors.last_name}</span>}
+                    </div>
                   </div>
+
                   <div className="form-group">
-                    <label className="form-label">
-                      Last Name <span>(required)</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="last_name"
-                      className={`form-input ${errors.last_name ? 'error' : ''}`}
-                      placeholder="Smith"
-                    />
-                    {errors.last_name && (
-                      <span className="form-error">{errors.last_name}</span>
-                    )}
+                    <label className="form-label">Email <span>(required)</span></label>
+                    <input type="email" name="email" className={`form-input ${errors.email ? 'error' : ''}`} placeholder="jane@example.com" />
+                    {errors.email && <span className="form-error">{errors.email}</span>}
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label">
-                    Email <span>(required)</span>
+                  <label className="form-checkbox">
+                    <input type="checkbox" name="newsletter" value="yes" />
+                    <span>Keep me updated on Key Change news</span>
                   </label>
-                  <input
-                    type="email"
-                    name="email"
-                    className={`form-input ${errors.email ? 'error' : ''}`}
-                    placeholder="jane@example.com"
-                  />
-                  {errors.email && <span className="form-error">{errors.email}</span>}
-                </div>
 
-                <label className="form-checkbox">
-                  <input type="checkbox" name="newsletter" value="yes" />
-                  <span>Keep me updated on Key Change news</span>
-                </label>
+                  <div className="form-group">
+                    <label className="form-label">Message <span>(required)</span></label>
+                    <textarea name="message" className={`form-textarea ${errors.message ? 'error' : ''}`} placeholder="Tell us how you would like to help..." rows={5} />
+                    {errors.message && <span className="form-error">{errors.message}</span>}
+                  </div>
 
-                <div className="form-group">
-                  <label className="form-label">
-                    Message <span>(required)</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    className={`form-textarea ${errors.message ? 'error' : ''}`}
-                    placeholder="Tell us how you would like to help..."
-                    rows={5}
-                  />
-                  {errors.message && (
-                    <span className="form-error">{errors.message}</span>
+                  {status === 'error' && (
+                    <div className="form-error" style={{ marginBottom: '1rem' }}>
+                      {submitError || 'Something went wrong. Please try again.'}
+                    </div>
                   )}
-                </div>
 
-                {status === 'error' && (
-                  <div className="form-error" style={{ marginBottom: '1rem' }}>
-                    {submitError || 'Something went wrong. Please try again.'}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{ width: '100%' }}
-                  disabled={status === 'submitting'}
-                >
-                  {status === 'submitting' ? 'Sending...' : 'Send Message'}
-                </button>
-              </form>
-            )}
-          </div>
+                  <button type="submit" className="btn2-submit" disabled={status === 'submitting'}>
+                    {status === 'submitting' ? 'Sending…' : 'Send Message'}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </Reveal>
         </div>
       </div>
     </section>
   )
 }
 
+/* ─── PAGE ROOT ─── */
 export default function Home() {
   return (
     <>
       <HeroSection />
+      <TickerBar />
       <ImpactSection />
       <HowItWorks />
       <StorySection />

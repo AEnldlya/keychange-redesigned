@@ -93,8 +93,7 @@ export default function DonatePage() {
 
   return (
     <>
-      {/* Page Header */}
-      <div className="page-header">
+      <div className="page-header-v2">
         <h1>Donate an Instrument</h1>
         <p>Give your unused instrument a new life in the hands of a student.</p>
       </div>

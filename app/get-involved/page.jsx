@@ -88,8 +88,7 @@ export default function GetInvolvedPage() {
 
   return (
     <>
-      {/* Page Header */}
-      <div className="page-header">
+      <div className="page-header-v2">
         <h1>Get Involved</h1>
         <p>Join our team of volunteers making music accessible.</p>
       </div>
