@@ -111,13 +111,7 @@ export default function DonatePage() {
             <div className="form-card">
               {status === 'success' ? (
                 <div className="form-success">
-                  <CheckCircle
-                    size={64}
-                    style={{
-                      color: 'var(--color-terracotta)',
-                      marginBottom: '1.5rem',
-                    }}
-                  />
+                  <CheckCircle size={56} className="form-success-icon" />
                   <h3>Donation submitted</h3>
                   <p>
                     Thank you for your generosity. We will review your
@@ -127,15 +121,7 @@ export default function DonatePage() {
               ) : (
                 <form onSubmit={handleSubmit}>
                   {/* Contact Info */}
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1.25rem',
-                      marginBottom: '1.5rem',
-                    }}
-                  >
-                    Your Information
-                  </h3>
+                  <h3 className="form-section-heading">Your Information</h3>
 
                   <div className="form-row">
                     <div className="form-group">
@@ -196,17 +182,7 @@ export default function DonatePage() {
                     </div>
                   </div>
 
-                  {/* Instrument Details */}
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1.25rem',
-                      marginTop: '2rem',
-                      marginBottom: '1.5rem',
-                    }}
-                  >
-                    Instrument Details
-                  </h3>
+                  <h3 className="form-section-heading">Instrument Details</h3>
 
                   <div className="form-group">
                     <label className="form-label">

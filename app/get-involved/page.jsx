@@ -155,13 +155,7 @@ export default function GetInvolvedPage() {
             <div className="form-card">
               {status === 'success' ? (
                 <div className="form-success">
-                  <CheckCircle
-                    size={64}
-                    style={{
-                      color: 'var(--color-terracotta)',
-                      marginBottom: '1.5rem',
-                    }}
-                  />
+                  <CheckCircle size={56} className="form-success-icon" />
                   <h3>Application received</h3>
                   <p>
                     Thank you for your interest in volunteering. We will be in
@@ -171,15 +165,7 @@ export default function GetInvolvedPage() {
               ) : (
                 <form onSubmit={handleSubmit}>
                   {/* Contact Info */}
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1.25rem',
-                      marginBottom: '1.5rem',
-                    }}
-                  >
-                    Your Information
-                  </h3>
+                  <h3 className="form-section-heading">Your Information</h3>
 
                   <div className="form-row">
                     <div className="form-group">
@@ -263,16 +249,7 @@ export default function GetInvolvedPage() {
                   </div>
 
                   {/* Volunteer Roles */}
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1.25rem',
-                      marginTop: '2rem',
-                      marginBottom: '1.5rem',
-                    }}
-                  >
-                    How would you like to help?
-                  </h3>
+                  <h3 className="form-section-heading">How would you like to help?</h3>
 
                   <div className="checkbox-group">
                     {volunteerRoles.map((role) => (
