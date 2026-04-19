@@ -96,7 +96,6 @@ function inv(p, s, e) { return Math.min(1, Math.max(0, (p - s) / (e - s))) }
 
 function HeroSection() {
   const containerRef = useRef(null)
-  const videoRef     = useRef(null)
   const videoBoxRef  = useRef(null)
   const overlayRef   = useRef(null)
   const imgTL        = useRef(null)
@@ -117,11 +116,6 @@ function HeroSection() {
       if (!el) return
       const rect = el.getBoundingClientRect()
       const p    = Math.min(1, Math.max(0, -rect.top / (el.offsetHeight - window.innerHeight)))
-
-      /* ── Video scrub (every frame, starts at 48%) ── */
-      const vid = videoRef.current
-      if (vid?.duration && isFinite(vid.duration))
-        vid.currentTime = Math.max(0, (p - 0.48) / 0.52) * vid.duration
 
       /* ── Video box: scale + borderRadius + overlay ── */
       if (videoBoxRef.current) {
@@ -190,7 +184,7 @@ function HeroSection() {
     <div ref={containerRef} style={{ height: '380vh', position: 'relative' }}>
       <div style={{
         position: 'sticky', top: 0, height: '100vh',
-        overflow: 'hidden', background: 'var(--bg-dark)',
+        overflow: 'clip', background: 'var(--bg-dark)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
 
@@ -198,16 +192,16 @@ function HeroSection() {
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to bottom, rgba(15,25,35,0.6) 0%, transparent 100%)', zIndex: 20, pointerEvents: 'none' }} />
 
         {/* ── Corner instrument tiles ── */}
-        <div ref={imgTL} style={tile({ top: '7%', left: '4%' })}>
+        <div ref={imgTL} className="hero-tile" style={tile({ top: '7%', left: '4%' })}>
           <img src="/assets/guitarra.webp"    alt="Guitar"      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
-        <div ref={imgTR} style={tile({ top: '7%', right: '4%' })}>
+        <div ref={imgTR} className="hero-tile" style={tile({ top: '7%', right: '4%' })}>
           <img src="/assets/microphone.webp"  alt="Microphone"  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
-        <div ref={imgBL} style={tile({ bottom: '7%', left: '4%' })}>
+        <div ref={imgBL} className="hero-tile" style={tile({ bottom: '7%', left: '4%' })}>
           <img src="/assets/drums.webp"       alt="Drums"       style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
-        <div ref={imgBR} style={tile({ bottom: '7%', right: '4%' })}>
+        <div ref={imgBR} className="hero-tile" style={tile({ bottom: '7%', right: '4%' })}>
           <img src="/assets/music-stand.webp" alt="Music stand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
 
@@ -223,11 +217,6 @@ function HeroSection() {
         >
           <img src="/assets/hero.webp" alt="" aria-hidden
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-          <video
-            ref={videoRef} src="/assets/hero-video.mp4"
-            muted playsInline preload="auto"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
-          />
           <div ref={overlayRef}
             style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgb(15,25,35)', opacity: 0.38 }} />
         </div>
@@ -365,7 +354,7 @@ function StatsSection() {
       <div className="container">
         <motion.div
           ref={ref}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--sp-5)' }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--sp-5)' }}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
@@ -431,43 +420,66 @@ function HowItWorks() {
   const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['100vw', '0vw'])
   const xs  = [x0, x1, x2, x3]
 
+  const cardInner = (step) => (
+    <>
+      <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 400, color: 'var(--blue)', opacity: 0.3, display: 'block', marginBottom: 'var(--sp-3)', lineHeight: 1 }}>{step.number}</span>
+      <step.icon size={24} style={{ color: 'var(--blue)', marginBottom: 'var(--sp-4)' }} />
+      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 400, color: '#fff', marginBottom: 'var(--sp-3)' }}>{step.title}</h3>
+      <p style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>{step.desc}</p>
+    </>
+  )
+
+  const sectionHeader = (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      style={{ textAlign: 'center', marginBottom: 'var(--sp-12)' }}
+    >
+      <span style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--blue)', marginBottom: 'var(--sp-3)' }}>The Process</span>
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
+    </motion.div>
+  )
+
   return (
-    <div ref={containerRef} style={{ height: '300vh', background: 'var(--bg-dark)' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          style={{ textAlign: 'center', marginBottom: 'var(--sp-12)' }}
-        >
-          <span style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--blue)', marginBottom: 'var(--sp-3)' }}>The Process</span>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
-        </motion.div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
+    <>
+      {/* Mobile: simple stacked layout, no sticky scroll */}
+      <section className="how-works-mobile" style={{ background: 'var(--bg-dark)', padding: 'var(--sp-20) var(--sp-6)' }}>
+        {sectionHeader}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto' }}>
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
-              style={{
-                x: xs[i],
-                padding: 'var(--sp-8)',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 'var(--radius-lg)',
-                backdropFilter: 'blur(12px)',
-              }}
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.55, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              style={{ padding: 'var(--sp-8)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius-lg)', backdropFilter: 'blur(12px)' }}
             >
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 400, color: 'var(--blue)', opacity: 0.3, display: 'block', marginBottom: 'var(--sp-3)', lineHeight: 1 }}>{step.number}</span>
-              <step.icon size={24} style={{ color: 'var(--blue)', marginBottom: 'var(--sp-4)' }} />
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 400, color: '#fff', marginBottom: 'var(--sp-3)' }}>{step.title}</h3>
-              <p style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>{step.desc}</p>
+              {cardInner(step)}
             </motion.div>
           ))}
         </div>
+      </section>
+
+      {/* Desktop: scroll-driven slide-in animation */}
+      <div ref={containerRef} className="how-works-desktop" style={{ height: '300vh', background: 'var(--bg-dark)' }}>
+        <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'clip', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
+          {sectionHeader}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
+            {steps.map((step, i) => (
+              <motion.div
+                key={step.number}
+                style={{ x: xs[i], padding: 'var(--sp-8)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius-lg)', backdropFilter: 'blur(12px)' }}
+              >
+                {cardInner(step)}
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

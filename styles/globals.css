@@ -236,6 +236,13 @@ button { cursor: pointer; border: none; background: none; }
   background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
 }
 
+/* Hero tiles: shorter on mobile so they don't overlap center text */
+@media (max-width: 640px) { .hero-tile { height: 28% !important; } }
+
+/* HowItWorks: show/hide desktop vs mobile layouts */
+@media (max-width: 700px) { .how-works-desktop { display: none !important; } }
+@media (min-width: 701px) { .how-works-mobile  { display: none !important; } }
+
 /* ════════════════════════════════════════════════
    TICKER
 ════════════════════════════════════════════════ */
