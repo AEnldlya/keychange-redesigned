@@ -86,65 +86,105 @@ function AnimatedCounter({ end, suffix = '', prefix = '' }) {
 
 
 /* ══════════════════════════════════════════════
-   HERO — Mosaic tiles → zoom into full-screen video
-   4 instrument images scatter outward while center
-   video expands. Three text phases fly in/out.
-   Video scrubs every frame as you scroll.
+   HERO — Mosaic tiles → zoom → full-screen video
+   Pure DOM ref updates via native scroll listener.
+   Zero React re-renders on scroll = maximum smoothness.
+   Bebas Neue font for hero text only.
 ══════════════════════════════════════════════ */
+function lerp(a, b, t) { return a + (b - a) * t }
+function inv(p, s, e) { return Math.min(1, Math.max(0, (p - s) / (e - s))) }
+
 function HeroSection() {
   const containerRef = useRef(null)
   const videoRef     = useRef(null)
+  const videoBoxRef  = useRef(null)
+  const overlayRef   = useRef(null)
+  const imgTL        = useRef(null)
+  const imgTR        = useRef(null)
+  const imgBL        = useRef(null)
+  const imgBR        = useRef(null)
+  const t1Ref        = useRef(null)
+  const t2Ref        = useRef(null)
+  const t3Ref        = useRef(null)
+  const hintRef      = useRef(null)
   const [mounted, setMounted] = useState(false)
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  })
-
-  useEffect(() => { setMounted(true) }, [])
-
-  /* Scrub every video frame — starts when video reaches full screen (~50%) */
   useEffect(() => {
-    const vid = videoRef.current
-    if (!vid) return
-    return scrollYProgress.on('change', (v) => {
-      if (vid.duration && isFinite(vid.duration)) {
-        const phase = Math.max(0, (v - 0.48) / 0.52)
-        vid.currentTime = phase * vid.duration
+    setMounted(true)
+
+    const onScroll = () => {
+      const el = containerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const p    = Math.min(1, Math.max(0, -rect.top / (el.offsetHeight - window.innerHeight)))
+
+      /* ── Video scrub (every frame, starts at 48%) ── */
+      const vid = videoRef.current
+      if (vid?.duration && isFinite(vid.duration))
+        vid.currentTime = Math.max(0, (p - 0.48) / 0.52) * vid.duration
+
+      /* ── Video box: scale + borderRadius + overlay ── */
+      if (videoBoxRef.current) {
+        const s = lerp(0.22, 1,    inv(p, 0.16, 0.52))
+        const r = lerp(18,   0,    inv(p, 0.16, 0.52))
+        videoBoxRef.current.style.transform    = `scale(${s})`
+        videoBoxRef.current.style.borderRadius = `${r}px`
       }
-    })
-  }, [scrollYProgress])
+      if (overlayRef.current)
+        overlayRef.current.style.opacity = lerp(0.38, 0.68, inv(p, 0.16, 0.62))
 
-  /* ── Video: small box → full screen ── */
-  const videoScale  = useTransform(scrollYProgress, [0.16, 0.52], [0.22, 1])
-  const videoRadius = useTransform(scrollYProgress, [0.16, 0.52], [18, 0])
-  const overlayOp   = useTransform(scrollYProgress, [0.16, 0.62], [0.38, 0.68])
+      /* ── Corner images: scatter outward ── */
+      const sc  = inv(p, 0.08, 0.44)          // 0→1 scatter progress
+      const iop = lerp(1, 0, inv(p, 0.10, 0.40))
+      const set = (ref, dx, dy) => {
+        if (!ref.current) return
+        ref.current.style.transform = `translate(${dx * sc * 140}%, ${dy * sc * 140}%)`
+        ref.current.style.opacity   = iop
+      }
+      set(imgTL, -1, -1)
+      set(imgTR,  1, -1)
+      set(imgBL, -1,  1)
+      set(imgBR,  1,  1)
 
-  /* ── 4 corner images fly outward ── */
-  const imgOp = useTransform(scrollYProgress, [0.1, 0.4], [1, 0])
-  const tlX   = useTransform(scrollYProgress, [0.08, 0.44], ['0%', '-140%'])
-  const tlY   = useTransform(scrollYProgress, [0.08, 0.44], ['0%', '-140%'])
-  const trX   = useTransform(scrollYProgress, [0.08, 0.44], ['0%',  '140%'])
-  const trY   = useTransform(scrollYProgress, [0.08, 0.44], ['0%', '-140%'])
-  const blX   = useTransform(scrollYProgress, [0.08, 0.44], ['0%', '-140%'])
-  const blY   = useTransform(scrollYProgress, [0.08, 0.44], ['0%',  '140%'])
-  const brX   = useTransform(scrollYProgress, [0.08, 0.44], ['0%',  '140%'])
-  const brY   = useTransform(scrollYProgress, [0.08, 0.44], ['0%',  '140%'])
+      /* ── Text phase 1: flies UP out ── */
+      if (t1Ref.current) {
+        const op = p < 0.06 ? inv(p, 0, 0.06) : p < 0.2 ? 1 : lerp(1, 0, inv(p, 0.2, 0.36))
+        t1Ref.current.style.opacity   = op
+        t1Ref.current.style.transform = `translateY(${lerp(0, -100, inv(p, 0.2, 0.38))}px)`
+      }
 
-  /* ── Text phase 1: headline flies UP out ── */
-  const t1Op = useTransform(scrollYProgress, [0, 0.06, 0.2, 0.36], [0, 1, 1, 0])
-  const t1Y  = useTransform(scrollYProgress, [0.2, 0.38], ['0px', '-100px'])
+      /* ── Text phase 2: stat flies IN then OUT ── */
+      if (t2Ref.current) {
+        const op = p < 0.52 ? 0 : p < 0.62 ? inv(p, 0.52, 0.62) : p < 0.74 ? 1 : lerp(1, 0, inv(p, 0.74, 0.84))
+        const y  = p < 0.52 ? 80 : p < 0.62 ? lerp(80, 0, inv(p, 0.52, 0.62)) : p < 0.74 ? 0 : lerp(0, -80, inv(p, 0.74, 0.84))
+        t2Ref.current.style.opacity   = op
+        t2Ref.current.style.transform = `translateY(${y}px)`
+      }
 
-  /* ── Text phase 2: big stat flies IN then UP out ── */
-  const t2Op = useTransform(scrollYProgress, [0.52, 0.62, 0.74, 0.84], [0, 1, 1, 0])
-  const t2Y  = useTransform(scrollYProgress, [0.52, 0.62, 0.74, 0.84], ['80px', '0px', '0px', '-80px'])
+      /* ── Text phase 3: CTA flies IN ── */
+      if (t3Ref.current) {
+        const op = inv(p, 0.86, 0.96)
+        t3Ref.current.style.opacity   = op
+        t3Ref.current.style.transform = `translateY(${lerp(60, 0, op)}px)`
+      }
 
-  /* ── Text phase 3: CTA flies IN from below ── */
-  const t3Op = useTransform(scrollYProgress, [0.86, 0.96], [0, 1])
-  const t3Y  = useTransform(scrollYProgress, [0.86, 0.96], ['60px', '0px'])
+      /* ── Scroll hint ── */
+      if (hintRef.current)
+        hintRef.current.style.opacity = lerp(1, 0, inv(p, 0, 0.07))
+    }
 
-  /* ── Scroll hint ── */
-  const hintOp = useTransform(scrollYProgress, [0, 0.07], [1, 0])
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  /* Shared image tile style */
+  const tile = (pos) => ({
+    position: 'absolute', ...pos,
+    width: '24%', height: '43%',
+    borderRadius: 14, overflow: 'hidden',
+    willChange: 'transform, opacity', zIndex: 5,
+  })
 
   return (
     <div ref={containerRef} style={{ height: '380vh', position: 'relative' }}>
@@ -154,87 +194,58 @@ function HeroSection() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
 
-        {/* ── TL: Guitar ── */}
-        <motion.div style={{
-          position: 'absolute', top: '7%', left: '4%',
-          width: '24%', height: '43%',
-          borderRadius: 14, overflow: 'hidden',
-          x: tlX, y: tlY, opacity: imgOp, zIndex: 5,
-        }}>
-          <img src="/assets/guitarra.webp" alt="Guitar"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </motion.div>
+        {/* ── Top gradient so nav links stay readable ── */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to bottom, rgba(15,25,35,0.6) 0%, transparent 100%)', zIndex: 20, pointerEvents: 'none' }} />
 
-        {/* ── TR: Microphone ── */}
-        <motion.div style={{
-          position: 'absolute', top: '7%', right: '4%',
-          width: '24%', height: '43%',
-          borderRadius: 14, overflow: 'hidden',
-          x: trX, y: trY, opacity: imgOp, zIndex: 5,
-        }}>
-          <img src="/assets/microphone.webp" alt="Microphone"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </motion.div>
+        {/* ── Corner instrument tiles ── */}
+        <div ref={imgTL} style={tile({ top: '7%', left: '4%' })}>
+          <img src="/assets/guitarra.webp"    alt="Guitar"      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div ref={imgTR} style={tile({ top: '7%', right: '4%' })}>
+          <img src="/assets/microphone.webp"  alt="Microphone"  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div ref={imgBL} style={tile({ bottom: '7%', left: '4%' })}>
+          <img src="/assets/drums.webp"       alt="Drums"       style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div ref={imgBR} style={tile({ bottom: '7%', right: '4%' })}>
+          <img src="/assets/music-stand.webp" alt="Music stand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
 
-        {/* ── BL: Drums ── */}
-        <motion.div style={{
-          position: 'absolute', bottom: '7%', left: '4%',
-          width: '24%', height: '43%',
-          borderRadius: 14, overflow: 'hidden',
-          x: blX, y: blY, opacity: imgOp, zIndex: 5,
-        }}>
-          <img src="/assets/drums.webp" alt="Drums"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </motion.div>
-
-        {/* ── BR: Music stand ── */}
-        <motion.div style={{
-          position: 'absolute', bottom: '7%', right: '4%',
-          width: '24%', height: '43%',
-          borderRadius: 14, overflow: 'hidden',
-          x: brX, y: brY, opacity: imgOp, zIndex: 5,
-        }}>
-          <img src="/assets/music-stand.webp" alt="Music stand"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </motion.div>
-
-        {/* ── Center video — expands to full screen ── */}
-        <motion.div style={{
-          position: 'absolute', inset: 0,
-          scale: videoScale,
-          borderRadius: videoRadius,
-          overflow: 'hidden',
-          transformOrigin: 'center center',
-          willChange: 'transform',
-          zIndex: 3,
-        }}>
+        {/* ── Center video box — grows to full screen ── */}
+        <div
+          ref={videoBoxRef}
+          style={{
+            position: 'absolute', inset: 0,
+            transform: 'scale(0.22)', borderRadius: 18,
+            overflow: 'hidden', transformOrigin: 'center',
+            willChange: 'transform, border-radius', zIndex: 3,
+          }}
+        >
           <img src="/assets/hero.webp" alt="" aria-hidden
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           <video
-            ref={videoRef}
-            src="/assets/hero-video.mp4"
+            ref={videoRef} src="/assets/hero-video.mp4"
             muted playsInline preload="auto"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
           />
-          <motion.div style={{
-            position: 'absolute', inset: 0, zIndex: 2,
-            background: 'rgb(15,25,35)', opacity: overlayOp,
-          }} />
-        </motion.div>
+          <div ref={overlayRef}
+            style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgb(15,25,35)', opacity: 0.38 }} />
+        </div>
 
-        {/* ── Phase 1: "Music belongs to everyone" — flies UP out ── */}
-        <motion.div style={{
+        {/* ── Phase 1: Headline — flies UP out ── */}
+        <div ref={t1Ref} style={{
           position: 'absolute', inset: 0, zIndex: 10,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           textAlign: 'center', padding: '0 var(--sp-6)',
-          opacity: t1Op, y: t1Y, pointerEvents: 'none',
+          opacity: 0, pointerEvents: 'none',
+          willChange: 'transform, opacity',
         }}>
           <motion.span
             initial={{ opacity: 0, y: 14 }}
             animate={mounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.55, delay: 0.2 }}
-            style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)', marginBottom: 'var(--sp-5)' }}
+            style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.45)', marginBottom: 'var(--sp-5)' }}
           >
             Student-Led Nonprofit
           </motion.span>
@@ -242,34 +253,35 @@ function HeroSection() {
             initial={{ opacity: 0, y: 52 }}
             animate={mounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.85, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3.5rem, 9vw, 7rem)', fontWeight: 400, lineHeight: 1, color: '#fff' }}
+            style={{ fontFamily: 'var(--font-hero)', fontSize: 'clamp(4rem, 11vw, 9rem)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '0.02em', color: '#fff' }}
           >
             Music belongs<br />to everyone
           </motion.h1>
-        </motion.div>
+        </div>
 
-        {/* ── Phase 2: Big stat — flies IN then flies UP out ── */}
-        <motion.div style={{
+        {/* ── Phase 2: Big 3.6M stat — flies IN then OUT ── */}
+        <div ref={t2Ref} style={{
           position: 'absolute', inset: 0, zIndex: 10,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           textAlign: 'center', padding: '0 var(--sp-6)',
-          opacity: t2Op, y: t2Y, pointerEvents: 'none',
+          opacity: 0, pointerEvents: 'none',
+          willChange: 'transform, opacity',
         }}>
-          <span style={{ display: 'block', fontFamily: 'var(--font-display)', fontSize: 'clamp(5rem, 14vw, 10rem)', fontWeight: 400, color: '#fff', lineHeight: 1, marginBottom: 'var(--sp-4)' }}>
+          <span style={{ display: 'block', fontFamily: 'var(--font-hero)', fontSize: 'clamp(6rem, 18vw, 13rem)', fontWeight: 400, color: '#fff', lineHeight: 1, letterSpacing: '0.04em', marginBottom: 'var(--sp-4)' }}>
             3.6M
           </span>
-          <span style={{ fontSize: 'clamp(1rem, 2.2vw, 1.3rem)', color: 'rgba(255,255,255,0.6)', maxWidth: 480, lineHeight: 1.5 }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'clamp(1rem, 2.2vw, 1.3rem)', color: 'rgba(255,255,255,0.55)', maxWidth: 460, lineHeight: 1.55, fontWeight: 300 }}>
             students in the US lack access<br />to music education
           </span>
-        </motion.div>
+        </div>
 
         {/* ── Phase 3: CTA — flies IN from below ── */}
-        <motion.div style={{
+        <div ref={t3Ref} style={{
           position: 'absolute', bottom: '14%', left: 0, right: 0,
           zIndex: 10, display: 'flex', justifyContent: 'center',
           gap: 'var(--sp-4)', flexWrap: 'wrap',
-          opacity: t3Op, y: t3Y,
+          opacity: 0, willChange: 'transform, opacity',
         }}>
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
             <Link href="/get-involved" className="btn btn-primary">
@@ -281,14 +293,14 @@ function HeroSection() {
               Donate an Instrument
             </Link>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* ── Scroll hint ── */}
-        <motion.div style={{
+        <div ref={hintRef} style={{
           position: 'absolute', bottom: 'var(--sp-8)', left: '50%',
           transform: 'translateX(-50%)', zIndex: 15,
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--sp-2)',
-          opacity: hintOp,
+          willChange: 'opacity',
         }}>
           <motion.div
             animate={{ y: [0, 8, 0] }}
@@ -296,7 +308,7 @@ function HeroSection() {
             style={{ width: 1, height: 44, background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)' }}
           />
           <span style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.3)' }}>scroll</span>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

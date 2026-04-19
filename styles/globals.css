@@ -2,7 +2,7 @@
 /* Righteous + Poppins | Vibrant Block-based | No Yellow */
 
 /* ── FONTS ── */
-@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Righteous&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* ── TOKENS ── */
 :root {
@@ -23,6 +23,7 @@
   --error:        #DC2626;
 
   /* Typography */
+  --font-hero:    'Bebas Neue', sans-serif;
   --font-display: 'Righteous', sans-serif;
   --font-body:    'Poppins', sans-serif;
 

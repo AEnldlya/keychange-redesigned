@@ -8,20 +8,22 @@ import { Menu, X } from 'lucide-react'
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [scrolled, setScrolled]     = useState(false)
   const pathname = usePathname()
-  const isHome = pathname === '/'
+  const isHome   = pathname === '/'
 
   useEffect(() => { setMobileOpen(false) }, [pathname])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60)
+    /* Threshold: past the 380vh hero the nav should solidify */
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.4)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const transparent = isHome && !scrolled && !mobileOpen
+  /* On home + before scroll: fully invisible, just text floating */
+  const ghost = isHome && !scrolled && !mobileOpen
 
   const links = [
     { href: '/about',        label: 'About' },
@@ -36,53 +38,76 @@ export default function Nav() {
       style={{
         position: isHome ? 'fixed' : 'sticky',
         top: 0,
-        background: transparent ? 'transparent' : 'rgba(244,241,236,0.96)',
-        borderBottom: transparent ? 'none' : '1px solid rgba(15,25,35,0.08)',
-        backdropFilter: transparent ? 'none' : 'blur(12px)',
+        /* Ghost: no bg, no border, no blur — just floating text */
+        background:     ghost ? 'transparent' : 'rgba(244,241,236,0.95)',
+        borderBottom:   ghost ? 'none'        : '1px solid rgba(15,25,35,0.07)',
+        backdropFilter: ghost ? 'none'        : 'blur(14px)',
+        transition: 'background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease',
       }}
     >
       <div className="nav-inner">
         <Link
           href="/"
           className="nav-logo"
-          style={{ color: transparent ? '#fff' : 'var(--ink)' }}
+          style={{
+            color: ghost ? 'rgba(255,255,255,0.82)' : 'var(--ink)',
+            fontWeight: 400,
+            transition: 'color 0.3s ease',
+          }}
         >
           <img
-            src="/assets/logo.svg"
-            alt=""
-            style={{ filter: transparent ? 'invert(1) brightness(2)' : 'none', transition: 'filter 0.3s ease' }}
+            src="/assets/logo.svg" alt=""
+            style={{
+              filter: ghost ? 'invert(1) brightness(2)' : 'none',
+              transition: 'filter 0.3s ease',
+            }}
           />
           Key Change
         </Link>
 
         <div className="nav-links">
           {links.map((l) => (
-            <motion.div key={l.href} whileHover={{ y: -1 }} transition={{ duration: 0.15 }}>
+            <motion.div key={l.href} whileHover={{ y: -1 }} transition={{ duration: 0.12 }}>
               <Link
                 href={l.href}
                 style={{
                   color: pathname === l.href
-                    ? (transparent ? '#fff' : 'var(--blue)')
-                    : (transparent ? 'rgba(255,255,255,0.8)' : 'var(--ink-2)'),
-                  fontWeight: pathname === l.href ? 600 : 500,
+                    ? (ghost ? 'rgba(255,255,255,0.95)' : 'var(--blue)')
+                    : (ghost ? 'rgba(255,255,255,0.55)' : 'var(--ink-2)'),
+                  fontWeight: pathname === l.href ? 600 : 400,
+                  fontSize: '0.8375rem',
+                  letterSpacing: '0.04em',
+                  transition: 'color 0.25s ease',
                 }}
               >
                 {l.label}
               </Link>
             </motion.div>
           ))}
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }}>
-            <Link href="/donate" className="btn btn-blue" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
-              Donate
-            </Link>
-          </motion.div>
+
+          {/* Donate button — hidden when ghost, shows when scrolled */}
+          <AnimatePresence>
+            {!ghost && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Link href="/donate" className="btn btn-blue"
+                  style={{ padding: '0.45rem 1.1rem', fontSize: '0.8375rem' }}>
+                  Donate
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <button
           className="nav-mobile-toggle"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          style={{ color: transparent ? '#fff' : 'var(--ink)' }}
+          style={{ color: ghost ? 'rgba(255,255,255,0.7)' : 'var(--ink)' }}
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -95,17 +120,11 @@ export default function Nav() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
           >
             {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                style={{
-                  color: pathname === l.href ? 'var(--blue)' : 'var(--ink)',
-                  fontWeight: pathname === l.href ? 700 : 500,
-                }}
-              >
+              <Link key={l.href} href={l.href}
+                style={{ color: pathname === l.href ? 'var(--blue)' : 'var(--ink)', fontWeight: pathname === l.href ? 600 : 400 }}>
                 {l.label}
               </Link>
             ))}
