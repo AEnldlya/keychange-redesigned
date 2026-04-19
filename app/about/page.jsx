@@ -69,25 +69,26 @@ export default function AboutPage() {
           <Reveal style={{ textAlign: 'center', marginBottom: 'var(--sp-16)' }}>
             <span className="eyebrow">The Team</span>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 400, marginBottom: 'var(--sp-4)' }}>Meet the founders</h2>
-            <p style={{ fontSize: '1.05rem', color: 'var(--ink-2)' }}>Two students with a shared vision</p>
+            <p style={{ fontSize: '1.05rem', color: 'var(--ink-2)' }}>Four students with a shared vision</p>
           </Reveal>
 
           <motion.div
             ref={foundersRef}
-            className="founders-grid"
+            className="founders-grid founders-grid-4"
             variants={containerVariants}
             initial="hidden"
             animate={foundersInView ? 'visible' : 'hidden'}
           >
             {[
-              { name: 'Ansh', role: 'Co-Founder', bio: 'High school student passionate about equal access to arts education.' },
-              { name: 'Jason', role: 'Co-Founder', bio: 'Musician and advocate for student opportunity in the Upper Valley.' },
+              { name: 'Andy Zhang',  instrument: 'Alto Saxophone' },
+              { name: 'Alex Chen',   instrument: 'Tenor Saxophone' },
+              { name: 'Jason',       instrument: 'Flute' },
+              { name: 'Ansh',        instrument: 'Flute' },
             ].map((f) => (
               <motion.div key={f.name} className="founder-card" variants={itemVariants} whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} transition={spring}>
                 <div className="founder-avatar">{f.name[0]}</div>
                 <h3>{f.name}</h3>
-                <p className="founder-role">{f.role}</p>
-                <p className="founder-bio">{f.bio}</p>
+                <p className="founder-instrument">{f.instrument}</p>
               </motion.div>
             ))}
           </motion.div>
