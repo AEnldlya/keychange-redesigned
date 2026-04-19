@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   motion,
@@ -8,166 +8,228 @@ import {
   useTransform,
   useInView,
   AnimatePresence,
-  useMotionValueEvent,
+  useMotionTemplate,
+  useMotionValue,
+  animate,
 } from 'framer-motion'
-import { Music, Search, HandHeart, Play, ArrowRight, CheckCircle, ArrowUpRight } from 'lucide-react'
+import {
+  Music, Search, HandHeart, Play,
+  ArrowRight, CheckCircle, ArrowUpRight,
+} from 'lucide-react'
 
-/* ─── Spring config (UX Pro Max: spring physics) ─── */
 const spring = { type: 'spring', stiffness: 400, damping: 30 }
-const springSmooth = { type: 'spring', stiffness: 200, damping: 28 }
+const HERO_SCROLL = 1500
 
-/* ─── Staggered reveal variants (21st.dev pattern) ─── */
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-}
-const itemVariants = {
-  hidden: { opacity: 0, y: 36 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
-}
-
-/* ─── Reveal wrapper ─── */
-function Reveal({ children, delay = 0, className = '', y = 36 }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+/* ══════════════════════════════════════════════
+   21st.dev — TextRevealByWord
+   Scroll-driven word-by-word reveal
+══════════════════════════════════════════════ */
+function Word({ children, progress, range }) {
+  const opacity = useTransform(progress, range, [0, 1])
   return (
-    <motion.div
-      ref={ref}
-      className={className}
-      initial={{ opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
+    <span style={{ position: 'relative', display: 'inline-block', marginRight: '0.35em' }}>
+      <span style={{ position: 'absolute', color: 'rgba(15,25,35,0.12)' }}>{children}</span>
+      <motion.span style={{ opacity, color: 'var(--ink)' }}>{children}</motion.span>
+    </span>
   )
 }
 
-/* ════════════════════════════════════════════════
-   HERO — Pinned 300vh scroll, multi-phase
-════════════════════════════════════════════════ */
-function HeroSection() {
-  const containerRef = useRef(null)
-  const videoRef = useRef(null)
-
+function TextRevealByWord({ text }) {
+  const ref = useRef(null)
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
+    target: ref,
+    offset: ['start 0.9', 'start 0.1'],
   })
-
-  /* Scrub video with scroll */
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const vid = videoRef.current
-    if (vid?.duration && isFinite(vid.duration)) {
-      vid.currentTime = v * vid.duration
-    }
-  })
-
-  /* Background parallax */
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.14])
-
-  /* Phase 1 — Eyebrow + Headline (0 → 0.3) */
-  const p1Opacity = useTransform(scrollYProgress, [0, 0.06, 0.22, 0.32], [0, 1, 1, 0])
-  const p1Y      = useTransform(scrollYProgress, [0, 0.06, 0.22, 0.32], [50, 0, 0, -40])
-
-  /* Phase 2 — Subtext (0.1 → 0.42) */
-  const p2Opacity = useTransform(scrollYProgress, [0.08, 0.16, 0.32, 0.42], [0, 1, 1, 0])
-  const p2Y       = useTransform(scrollYProgress, [0.08, 0.16], [30, 0])
-
-  /* Phase 3 — Stats (0.35 → 0.65) */
-  const p3Opacity = useTransform(scrollYProgress, [0.32, 0.42, 0.58, 0.68], [0, 1, 1, 0])
-  const p3Y       = useTransform(scrollYProgress, [0.32, 0.42], [40, 0])
-
-  /* Phase 4 — CTA (0.55 → 0.88) */
-  const p4Opacity = useTransform(scrollYProgress, [0.52, 0.62, 0.8, 0.9], [0, 1, 1, 0])
-
-  /* Scroll hint fades out early */
-  const hintOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0])
-
+  const words = text.split(' ')
   return (
-    <div ref={containerRef} className="hero-container">
-      <div className="hero-sticky">
-        {/* BG */}
-        <motion.div className="hero-bg" style={{ scale: bgScale }}>
-          <video
-            ref={videoRef}
-            className="hero-bg-video"
-            src="/assets/hero-video.mp4"
-            muted playsInline preload="auto"
-          />
-          <img src="/assets/hero.webp" alt="" className="hero-bg-img" aria-hidden />
-          <div className="hero-bg-overlay" />
-        </motion.div>
-
-        {/* Phase 1 — Headline */}
-        <motion.div className="hero-phase" style={{ opacity: p1Opacity, y: p1Y }}>
-          <span className="hero-eyebrow">Student-Led Nonprofit</span>
-          <h1 className="hero-headline">
-            Music belongs<br />to everyone
-          </h1>
-        </motion.div>
-
-        {/* Phase 2 — Subtext */}
-        <motion.div className="hero-phase" style={{ opacity: p2Opacity, y: p2Y }}>
-          <p className="hero-sub" style={{ maxWidth: 520 }}>
-            3.6 million students in the US lack access to music education.
-            We collect unused instruments and put them in the hands of students who need them most.
-          </p>
-        </motion.div>
-
-        {/* Phase 3 — Stats */}
-        <motion.div className="hero-phase" style={{ opacity: p3Opacity, y: p3Y }}>
-          <div className="hero-stat-row">
-            {[
-              { num: '3.6M', label: 'Students without music' },
-              { num: '100+', label: 'Instruments donated' },
-              { num: '5+',   label: 'Partner schools' },
-            ].map((s) => (
-              <div key={s.label} className="hero-stat">
-                <span className="hero-stat-num">{s.num}</span>
-                <span className="hero-stat-label">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Phase 4 — CTA */}
-        <motion.div className="hero-phase hero-phase-cta" style={{ opacity: p4Opacity }}>
-          <div className="hero-actions">
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
-              <Link href="/get-involved" className="btn btn-primary">
-                Get Involved <ArrowUpRight size={17} />
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
-              <Link href="/donate" className="btn btn-ghost">
-                Donate an Instrument
-              </Link>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Scroll hint */}
-        <motion.div className="hero-scroll-hint" style={{ opacity: hintOpacity }}>
-          <div className="hero-scroll-line" />
-          <span>scroll</span>
-        </motion.div>
-      </div>
+    <div ref={ref} style={{ position: 'relative', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+      <p style={{
+        display: 'flex', flexWrap: 'wrap', alignItems: 'baseline',
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+        lineHeight: 1.2, maxWidth: 900,
+      }}>
+        {words.map((word, i) => {
+          const start = i / words.length
+          const end = start + 1 / words.length
+          return <Word key={i} progress={scrollYProgress} range={[start, end]}>{word}</Word>
+        })}
+      </p>
     </div>
   )
 }
 
-/* ════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
+   21st.dev — AnimatedCounter
+   Spring-physics digit counting on scroll
+══════════════════════════════════════════════ */
+function AnimatedCounter({ end, suffix = '', prefix = '' }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const motionVal = useMotionValue(0)
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    const controls = animate(motionVal, end, {
+      duration: 2,
+      ease: 'easeOut',
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return controls.stop
+  }, [inView, end])
+
+  return (
+    <span ref={ref}>
+      {prefix}{display}{suffix}
+    </span>
+  )
+}
+
+/* ══════════════════════════════════════════════
+   21st.dev — ParallaxImg
+   Individual image with scroll-driven y + scale
+══════════════════════════════════════════════ */
+function ParallaxImg({ src, alt, start, end, style = {} }) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: [`${start}px end`, `end ${Math.abs(end)}px`],
+  })
+  const opacity = useTransform(scrollYProgress, [0.7, 1], [1, 0])
+  const scale  = useTransform(scrollYProgress, [0.7, 1], [1, 0.88])
+  const y      = useTransform(scrollYProgress, [0, 1], [start, end])
+  const transform = useMotionTemplate`translateY(${y}px) scale(${scale})`
+
+  return (
+    <motion.img
+      ref={ref}
+      src={src}
+      alt={alt}
+      style={{ transform, opacity, objectFit: 'cover', borderRadius: 14, display: 'block', ...style }}
+    />
+  )
+}
+
+/* ══════════════════════════════════════════════
+   21st.dev — CenterImage clip-path hero expand
+   + ParallaxImages with instrument photos
+   Adapted from "Modern Hero" pattern
+══════════════════════════════════════════════ */
+function HeroSection() {
+  const videoRef = useRef(null)
+  const { scrollY } = useScroll()
+
+  /* Clip-path: starts as centre square, expands to full screen */
+  const clip1   = useTransform(scrollY, [0, HERO_SCROLL], [20, 0])
+  const clip2   = useTransform(scrollY, [0, HERO_SCROLL], [80, 100])
+  const clipPath = useMotionTemplate`polygon(${clip1}% ${clip1}%, ${clip2}% ${clip1}%, ${clip2}% ${clip2}%, ${clip1}% ${clip2}%)`
+  const bgSize   = useTransform(scrollY, [0, HERO_SCROLL + 500], ['180%', '100%'])
+  const bgOpacity = useTransform(scrollY, [HERO_SCROLL, HERO_SCROLL + 500], [1, 0])
+
+  /* Headline parallax */
+  const textY       = useTransform(scrollY, [0, HERO_SCROLL], ['0%', '-25%'])
+  const textOpacity = useTransform(scrollY, [0, HERO_SCROLL * 0.6], [1, 0])
+
+  /* Scrub video */
+  useEffect(() => {
+    const vid = videoRef.current
+    if (!vid) return
+    return scrollY.on('change', (v) => {
+      if (vid.duration && isFinite(vid.duration)) {
+        vid.currentTime = (Math.min(v, HERO_SCROLL) / HERO_SCROLL) * vid.duration
+      }
+    })
+  }, [scrollY])
+
+  return (
+    <div style={{ height: `calc(${HERO_SCROLL}px + 100vh)`, position: 'relative' }}>
+
+      {/* ── Expanding clip-path background ── */}
+      <motion.div
+        style={{
+          clipPath,
+          position: 'sticky', top: 0,
+          height: '100vh', width: '100%',
+          opacity: bgOpacity,
+          overflow: 'hidden',
+        }}
+      >
+        <motion.div style={{ backgroundSize: bgSize, position: 'absolute', inset: '-5% -2%', backgroundImage: 'url(/assets/hero.webp)', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+        <video
+          ref={videoRef}
+          src="/assets/hero-video.mp4"
+          muted playsInline preload="auto"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(160deg, rgba(15,25,35,0.78) 0%, rgba(15,25,35,0.48) 55%, rgba(15,25,35,0.72) 100%)' }} />
+      </motion.div>
+
+      {/* ── Centered headline (fades on scroll) ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, pointerEvents: 'none' }}>
+        <motion.div style={{ y: textY, opacity: textOpacity, textAlign: 'center', padding: '0 var(--sp-6)', pointerEvents: 'auto' }}>
+          <motion.span
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.55)', marginBottom: 'var(--sp-6)' }}
+          >
+            Student-Led Nonprofit
+          </motion.span>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 56 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3.5rem, 9vw, 7rem)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.01em', color: '#fff', marginBottom: 'var(--sp-8)' }}
+          >
+            Music belongs<br />to everyone
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            style={{ display: 'flex', gap: 'var(--sp-4)', justifyContent: 'center', flexWrap: 'wrap' }}
+          >
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
+              <Link href="/get-involved" className="btn btn-primary">Get Involved <ArrowUpRight size={17} /></Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
+              <Link href="/donate" className="btn btn-ghost">Donate an Instrument</Link>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* ── 21st.dev ParallaxImages — instrument photos at different speeds ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 6, maxWidth: 1100, margin: '0 auto', padding: '0 var(--sp-6)', pointerEvents: 'none' }}>
+        <div style={{ paddingTop: 200, display: 'flex', flexDirection: 'column', gap: 'var(--sp-8)' }}>
+          <ParallaxImg src="/assets/guitarra.webp"    alt="Guitar"      start={-180} end={200}  style={{ width: '32%', height: 220 }} />
+          <ParallaxImg src="/assets/microphone.webp"  alt="Microphone"  start={220}  end={-260} style={{ width: '52%', height: 280, alignSelf: 'center' }} />
+          <ParallaxImg src="/assets/drums.webp"       alt="Drums"       start={-180} end={200}  style={{ width: '36%', height: 220, alignSelf: 'flex-end' }} />
+        </div>
+      </div>
+
+      {/* Fade to page background */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35vh', background: 'linear-gradient(to bottom, transparent, var(--bg))', zIndex: 8 }} />
+
+      {/* Scroll hint */}
+      <motion.div
+        style={{ position: 'absolute', bottom: 'var(--sp-8)', left: '50%', transform: 'translateX(-50%)', zIndex: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--sp-2)', opacity: useTransform(scrollY, [0, 200], [1, 0]) }}
+      >
+        <div style={{ width: 1, height: 48, background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)' }} />
+        <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}>scroll</span>
+      </motion.div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════
    TICKER
-════════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 function TickerBar() {
-  const items = [
-    'Music belongs to everyone',
-    'Student-led · Upper Valley, NH',
-    'Collect · Inspect · Match · Play',
-    'Donate your unused instrument',
-    '3.6M students need access',
-  ]
+  const items = ['Music belongs to everyone', 'Student-led · Upper Valley, NH', 'Collect · Inspect · Match · Play', 'Donate your unused instrument', '3.6M students need access']
   const doubled = [...items, ...items]
   return (
     <div className="ticker" aria-hidden>
@@ -177,114 +239,189 @@ function TickerBar() {
         transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
       >
         {doubled.map((t, i) => (
-          <span key={i} className="ticker-item">
-            {t}<span className="ticker-dot">◆</span>
-          </span>
+          <span key={i} className="ticker-item">{t}<span className="ticker-dot">◆</span></span>
         ))}
       </motion.div>
     </div>
   )
 }
 
-/* ════════════════════════════════════════════════
-   IMPACT
-════════════════════════════════════════════════ */
-function ImpactSection() {
+/* ══════════════════════════════════════════════
+   21st.dev — TextRevealByWord: Mission section
+══════════════════════════════════════════════ */
+function MissionReveal() {
   return (
-    <section className="section section-alt">
+    <section className="section">
       <div className="container">
-        <div className="impact-grid">
-          <Reveal delay={0}>
-            <div className="impact-card">
-              <span className="impact-num">3.6M</span>
-              <p className="impact-label">Students without access to music education</p>
-              <span className="impact-source">Source: 2019 NAEP Arts Assessment</span>
-            </div>
-          </Reveal>
-          <div className="impact-copy">
-            <Reveal delay={0.08}><h2>The gap is real</h2></Reveal>
-            <Reveal delay={0.16}>
-              <p>Budget cuts and rising instrument costs have left millions of students on the sidelines. Schools cannot afford equipment. Families cannot afford rentals. Meanwhile, thousands of instruments sit unused.</p>
-            </Reveal>
-            <Reveal delay={0.24}>
-              <p>We bridge that gap — collecting, inspecting, and redistributing instruments to students and programs that need them.</p>
-            </Reveal>
-          </div>
-        </div>
+        <TextRevealByWord text="3.6 million students in the US lack access to music education. We collect unused instruments and put them in the hands of students who need them most." />
       </div>
     </section>
   )
 }
 
-/* ════════════════════════════════════════════════
-   HOW IT WORKS
-════════════════════════════════════════════════ */
-function HowItWorks() {
-  const steps = [
-    { number: '01', title: 'Collect',  description: 'We receive instrument donations from community members, schools, and music stores.', icon: Music },
-    { number: '02', title: 'Inspect',  description: 'Each instrument is evaluated, cleaned, and prepared for its next musician.', icon: Search },
-    { number: '03', title: 'Match',    description: 'We partner with schools to identify students who need instruments.', icon: HandHeart },
-    { number: '04', title: 'Play',     description: 'Instruments go directly into students hands, ready to make music.', icon: Play },
+/* ══════════════════════════════════════════════
+   21st.dev AnimatedCounter — Stats section
+══════════════════════════════════════════════ */
+function StatsSection() {
+  const stats = [
+    { value: 36, suffix: 'M', label: 'Students without music access', note: 'Source: 2019 NAEP' },
+    { value: 100, suffix: '+', label: 'Instruments donated', note: 'And counting' },
+    { value: 5, suffix: '+', label: 'Partner schools', note: 'Upper Valley, NH & VT' },
   ]
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="section">
+    <section className="section section-alt">
       <div className="container">
-        <Reveal className="how-header">
-          <span className="eyebrow">The Process</span>
-          <h2>How it works</h2>
-          <p>Four steps from donation to first notes</p>
-        </Reveal>
-
         <motion.div
           ref={ref}
-          className="how-grid"
-          variants={containerVariants}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--sp-5)' }}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
         >
-          {steps.map((step) => (
-            <motion.div key={step.number} className="how-card" variants={itemVariants}>
-              <span className="how-num">{step.number}</span>
-              <step.icon size={26} className="how-icon" />
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
+          {stats.map((s) => (
+            <motion.div
+              key={s.label}
+              className="impact-card"
+              variants={{ hidden: { opacity: 0, y: 36 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } } }}
+              whileHover={{ y: -6, boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}
+              transition={spring}
+            >
+              <span className="impact-num">
+                <AnimatedCounter end={s.value} suffix={s.suffix} />
+              </span>
+              <p className="impact-label">{s.label}</p>
+              <span className="impact-source">{s.note}</span>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Context copy */}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          style={{ maxWidth: 640, margin: 'var(--sp-16) auto 0', textAlign: 'center' }}
+        >
+          <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--ink-2)' }}>
+            Budget cuts and rising costs have left millions on the sidelines.
+            We bridge that gap — collecting, inspecting, and redistributing
+            instruments to students and programs that need them.
+          </p>
         </motion.div>
       </div>
     </section>
   )
 }
 
-/* ════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
+   21st.dev — Process Timeline (horizontal scroll)
+   Adapted from ContainerScroll + ProcessCard
+══════════════════════════════════════════════ */
+function HowItWorks() {
+  const containerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  })
+
+  const steps = [
+    { number: '01', title: 'Collect',  desc: 'We receive instrument donations from community members, schools, and music stores.', icon: Music },
+    { number: '02', title: 'Inspect',  desc: 'Each instrument is evaluated, cleaned, and prepared for its next musician.', icon: Search },
+    { number: '03', title: 'Match',    desc: 'We partner with schools to identify students who need instruments most.', icon: HandHeart },
+    { number: '04', title: 'Play',     desc: 'Instruments go directly into students hands, ready to make music.', icon: Play },
+  ]
+
+  /* Each card slides in from right sequentially */
+  const x0 = useTransform(scrollYProgress, [0,    0.25], ['100vw', '0vw'])
+  const x1 = useTransform(scrollYProgress, [0.15, 0.4 ], ['100vw', '0vw'])
+  const x2 = useTransform(scrollYProgress, [0.35, 0.6 ], ['100vw', '0vw'])
+  const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['100vw', '0vw'])
+  const xs  = [x0, x1, x2, x3]
+
+  return (
+    <div ref={containerRef} style={{ height: '300vh', background: 'var(--bg-dark)' }}>
+      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ textAlign: 'center', marginBottom: 'var(--sp-12)' }}
+        >
+          <span style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--blue)', marginBottom: 'var(--sp-3)' }}>The Process</span>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
+        </motion.div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.number}
+              style={{
+                x: xs[i],
+                padding: 'var(--sp-8)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 'var(--radius-lg)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 400, color: 'var(--blue)', opacity: 0.3, display: 'block', marginBottom: 'var(--sp-3)', lineHeight: 1 }}>{step.number}</span>
+              <step.icon size={24} style={{ color: 'var(--blue)', marginBottom: 'var(--sp-4)' }} />
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 400, color: '#fff', marginBottom: 'var(--sp-3)' }}>{step.title}</h3>
+              <p style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>{step.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════
    STORY
-════════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 function StorySection() {
   return (
     <section className="section section-alt">
       <div className="container">
         <div className="story-grid">
-          <Reveal className="story-media" y={60}>
+          <motion.div
+            className="story-media"
+            initial={{ opacity: 0, y: 60 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="story-img-wrap">
               <img src="/assets/guitarra.webp" alt="Guitar" />
               <div className="story-badge">Est. 2022</div>
             </div>
-          </Reveal>
+          </motion.div>
+
           <div className="story-copy">
-            <Reveal><span className="eyebrow">Our Story</span></Reveal>
-            <Reveal delay={0.08}><h2>Started by students,<br />for students</h2></Reveal>
-            <Reveal delay={0.16}><p>Key Change began when two high schoolers noticed something wrong. Their school had a thriving music program. Other schools just miles away had nothing. The instruments existed. The students existed. Only the connection was missing.</p></Reveal>
-            <Reveal delay={0.24}><p>What started as a single instrument drive has grown into a sustained effort to democratize music access across the Upper Valley.</p></Reveal>
-            <Reveal delay={0.3}>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={spring} style={{ display: 'inline-block', marginTop: 'var(--sp-6)' }}>
-                <Link href="/about" className="btn btn-outline-dark">
-                  Read Our Story <ArrowRight size={16} />
-                </Link>
+            {[
+              { el: <span className="eyebrow">Our Story</span>, delay: 0 },
+              { el: <h2>Started by students,<br />for students</h2>, delay: 0.08 },
+              { el: <p>Key Change began when two high schoolers noticed something wrong. Their school had a thriving music program. Other schools just miles away had nothing. The instruments existed. The students existed. Only the connection was missing.</p>, delay: 0.16 },
+              { el: <p>What started as a single instrument drive has grown into a sustained effort to democratize music access across the Upper Valley.</p>, delay: 0.24 },
+              { el: <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={spring} style={{ display: 'inline-block' }}><Link href="/about" className="btn btn-outline-dark">Read Our Story <ArrowRight size={16} /></Link></motion.div>, delay: 0.3 },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-70px' }}
+                transition={{ duration: 0.65, delay: item.delay, ease: [0.16, 1, 0.3, 1] }}
+                style={{ marginBottom: i < 4 ? 'var(--sp-4)' : 0 }}
+              >
+                {item.el}
               </motion.div>
-            </Reveal>
+            ))}
           </div>
         </div>
       </div>
@@ -292,15 +429,15 @@ function StorySection() {
   )
 }
 
-/* ════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    GALLERY — Interactive Bento (21st.dev pattern)
-════════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 function GallerySection() {
   const photos = [
-    { src: '/assets/microphone.webp', alt: 'Microphone',   label: 'Voice',         cls: 'gallery-large' },
-    { src: '/assets/guitarra.webp',   alt: 'Guitar',       label: 'Guitar',        cls: '' },
-    { src: '/assets/drums.webp',      alt: 'Drums',        label: 'Percussion',    cls: '' },
-    { src: '/assets/music-stand.webp',alt: 'Music stand',  label: 'Sheet Music',   cls: 'gallery-wide' },
+    { src: '/assets/microphone.webp', alt: 'Microphone',  label: 'Voice',       cls: 'gallery-large' },
+    { src: '/assets/guitarra.webp',   alt: 'Guitar',      label: 'Guitar',      cls: '' },
+    { src: '/assets/drums.webp',      alt: 'Drums',       label: 'Percussion',  cls: '' },
+    { src: '/assets/music-stand.webp',alt: 'Music stand', label: 'Sheet Music', cls: 'gallery-wide' },
   ]
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
@@ -308,50 +445,64 @@ function GallerySection() {
   return (
     <section className="section">
       <div className="container">
-        <Reveal className="gallery-header">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="gallery-header"
+        >
           <span className="eyebrow">Gallery</span>
           <h2>Every instrument tells a story</h2>
           <p>From donated guitars to refurbished keyboards, each piece carries potential.</p>
-        </Reveal>
+        </motion.div>
 
         <motion.div
           ref={ref}
           className="gallery-bento"
-          variants={containerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
         >
           {photos.map((p) => (
-            <motion.div key={p.src} className={`gallery-item ${p.cls}`} variants={itemVariants}>
+            <motion.div
+              key={p.src}
+              className={`gallery-item ${p.cls}`}
+              variants={{ hidden: { opacity: 0, y: 32, scale: 0.96 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+            >
               <motion.div
                 className="gallery-inner"
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               >
                 <img src={p.src} alt={p.alt} />
-                <div className="gallery-inner-overlay">
-                  <span>{p.label}</span>
-                </div>
+                <div className="gallery-inner-overlay"><span>{p.label}</span></div>
               </motion.div>
             </motion.div>
           ))}
         </motion.div>
 
-        <Reveal delay={0.2} className="gallery-cta">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="gallery-cta"
+        >
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring} style={{ display: 'inline-block' }}>
             <a href="https://instagram.com/keychangeproject/" target="_blank" rel="noopener" className="btn btn-outline-dark">
               Follow our journey <ArrowUpRight size={16} />
             </a>
           </motion.div>
-        </Reveal>
+        </motion.div>
       </div>
     </section>
   )
 }
 
-/* ════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    CONTACT
-════════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 function ContactSection() {
   const [status, setStatus] = useState('idle')
   const [errors, setErrors] = useState({})
@@ -388,83 +539,101 @@ function ContactSection() {
       <div className="container">
         <div className="contact-grid">
           <div>
-            <Reveal><span className="eyebrow eyebrow-light">Get in touch</span></Reveal>
-            <Reveal delay={0.08}><h2 className="contact-heading">Let's make music<br />together</h2></Reveal>
-            <Reveal delay={0.16}><p className="contact-desc">Have an instrument to donate? Want to volunteer? Just curious? We'd love to hear from you.</p></Reveal>
-            <Reveal delay={0.22}>
-              <div className="contact-links">
-                {[
-                  { label: 'Email', value: 'keychange.team@gmail.com', href: 'mailto:keychange.team@gmail.com' },
-                  { label: 'Instagram', value: '@keychangeproject', href: 'https://instagram.com/keychangeproject/' },
-                ].map((l) => (
-                  <div key={l.label} className="contact-link-item">
-                    <span className="contact-link-label">{l.label}</span>
-                    <a href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{l.value}</a>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
+            {[
+              { el: <span className="eyebrow eyebrow-light">Get in touch</span>, delay: 0 },
+              { el: <h2 className="contact-heading">Let's make music<br />together</h2>, delay: 0.08 },
+              { el: <p className="contact-desc">Have an instrument to donate? Want to volunteer? Just curious? We'd love to hear from you.</p>, delay: 0.16 },
+              { el: (
+                <div className="contact-links">
+                  {[
+                    { label: 'Email', value: 'keychange.team@gmail.com', href: 'mailto:keychange.team@gmail.com' },
+                    { label: 'Instagram', value: '@keychangeproject', href: 'https://instagram.com/keychangeproject/' },
+                  ].map((l) => (
+                    <div key={l.label} className="contact-link-item">
+                      <span className="contact-link-label">{l.label}</span>
+                      <a href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{l.value}</a>
+                    </div>
+                  ))}
+                </div>
+              ), delay: 0.22 },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-70px' }}
+                transition={{ duration: 0.65, delay: item.delay, ease: [0.16, 1, 0.3, 1] }}
+                style={{ marginBottom: 'var(--sp-4)' }}
+              >
+                {item.el}
+              </motion.div>
+            ))}
           </div>
 
-          <Reveal delay={0.12}>
-            <div className="contact-form-box">
-              <AnimatePresence mode="wait">
-                {status === 'success' ? (
-                  <motion.div key="ok" className="form-success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
-                    <CheckCircle size={52} style={{ color: 'var(--blue)', margin: '0 auto var(--sp-6)' }} />
-                    <h3>Message sent</h3>
-                    <p>We'll get back to you within 48 hours.</p>
-                  </motion.div>
-                ) : (
-                  <motion.form key="form" onSubmit={handleSubmit}>
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label className="form-label">First Name <span>(required)</span></label>
-                        <input type="text" name="first_name" className={`form-input ${errors.first_name ? 'error' : ''}`} placeholder="Jane" />
-                        {errors.first_name && <span className="form-error">{errors.first_name}</span>}
-                      </div>
-                      <div className="form-group">
-                        <label className="form-label">Last Name <span>(required)</span></label>
-                        <input type="text" name="last_name" className={`form-input ${errors.last_name ? 'error' : ''}`} placeholder="Smith" />
-                        {errors.last_name && <span className="form-error">{errors.last_name}</span>}
-                      </div>
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-70px' }}
+            transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="contact-form-box"
+          >
+            <AnimatePresence mode="wait">
+              {status === 'success' ? (
+                <motion.div key="ok" className="form-success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
+                  <CheckCircle size={52} style={{ color: 'var(--blue)', margin: '0 auto var(--sp-6)' }} />
+                  <h3>Message sent</h3>
+                  <p>We'll get back to you within 48 hours.</p>
+                </motion.div>
+              ) : (
+                <motion.form key="form" onSubmit={handleSubmit}>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">First Name <span>(required)</span></label>
+                      <input type="text" name="first_name" className={`form-input ${errors.first_name ? 'error' : ''}`} placeholder="Jane" />
+                      {errors.first_name && <span className="form-error">{errors.first_name}</span>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Email <span>(required)</span></label>
-                      <input type="email" name="email" className={`form-input ${errors.email ? 'error' : ''}`} placeholder="jane@example.com" />
-                      {errors.email && <span className="form-error">{errors.email}</span>}
+                      <label className="form-label">Last Name <span>(required)</span></label>
+                      <input type="text" name="last_name" className={`form-input ${errors.last_name ? 'error' : ''}`} placeholder="Smith" />
+                      {errors.last_name && <span className="form-error">{errors.last_name}</span>}
                     </div>
-                    <label className="form-checkbox">
-                      <input type="checkbox" name="newsletter" value="yes" />
-                      <span>Keep me updated on Key Change news</span>
-                    </label>
-                    <div className="form-group">
-                      <label className="form-label">Message <span>(required)</span></label>
-                      <textarea name="message" className={`form-textarea ${errors.message ? 'error' : ''}`} placeholder="Tell us how you'd like to help..." rows={5} />
-                      {errors.message && <span className="form-error">{errors.message}</span>}
-                    </div>
-                    {status === 'error' && <div className="form-error" style={{ marginBottom: 'var(--sp-4)' }}>{submitError}</div>}
-                    <button type="submit" className="form-submit" disabled={status === 'submitting'}>
-                      {status === 'submitting' ? 'Sending…' : 'Send Message'}
-                    </button>
-                  </motion.form>
-                )}
-              </AnimatePresence>
-            </div>
-          </Reveal>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Email <span>(required)</span></label>
+                    <input type="email" name="email" className={`form-input ${errors.email ? 'error' : ''}`} placeholder="jane@example.com" />
+                    {errors.email && <span className="form-error">{errors.email}</span>}
+                  </div>
+                  <label className="form-checkbox">
+                    <input type="checkbox" name="newsletter" value="yes" />
+                    <span>Keep me updated on Key Change news</span>
+                  </label>
+                  <div className="form-group">
+                    <label className="form-label">Message <span>(required)</span></label>
+                    <textarea name="message" className={`form-textarea ${errors.message ? 'error' : ''}`} placeholder="Tell us how you'd like to help..." rows={5} />
+                    {errors.message && <span className="form-error">{errors.message}</span>}
+                  </div>
+                  {status === 'error' && <div className="form-error" style={{ marginBottom: 'var(--sp-4)' }}>{submitError}</div>}
+                  <button type="submit" className="form-submit" disabled={status === 'submitting'}>
+                    {status === 'submitting' ? 'Sending…' : 'Send Message'}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </section>
   )
 }
 
-/* ─── PAGE ROOT ─── */
+/* ── PAGE ROOT ── */
 export default function Home() {
   return (
     <>
       <HeroSection />
       <TickerBar />
-      <ImpactSection />
+      <MissionReveal />
+      <StatsSection />
       <HowItWorks />
       <StorySection />
       <GallerySection />
