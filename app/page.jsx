@@ -413,11 +413,11 @@ function HowItWorks() {
     { number: '04', title: 'Play',     desc: 'Instruments go directly into students hands, ready to make music.', icon: Play },
   ]
 
-  /* Each card slides in from right sequentially */
-  const x0 = useTransform(scrollYProgress, [0,    0.25], ['100vw', '0vw'])
-  const x1 = useTransform(scrollYProgress, [0.15, 0.4 ], ['100vw', '0vw'])
-  const x2 = useTransform(scrollYProgress, [0.35, 0.6 ], ['100vw', '0vw'])
-  const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['100vw', '0vw'])
+  /* Each card slides in from right sequentially — 105% of own width, not 100vw, so it never causes page-level horizontal scroll */
+  const x0 = useTransform(scrollYProgress, [0,    0.25], ['105%', '0%'])
+  const x1 = useTransform(scrollYProgress, [0.15, 0.4 ], ['105%', '0%'])
+  const x2 = useTransform(scrollYProgress, [0.35, 0.6 ], ['105%', '0%'])
+  const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['105%', '0%'])
   const xs  = [x0, x1, x2, x3]
 
   const cardInner = (step) => (
@@ -463,7 +463,8 @@ function HowItWorks() {
         </div>
       </section>
 
-      {/* Desktop: scroll-driven slide-in animation */}
+      {/* Desktop: scroll-driven slide-in animation — outer wrapper clips any x-overflow so the page never scrolls horizontally */}
+      <div style={{ overflowX: 'clip' }}>
       <div ref={containerRef} className="how-works-desktop" style={{ height: '300vh', background: 'var(--bg-dark)' }}>
         <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'clip', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
           {sectionHeader}
@@ -479,6 +480,7 @@ function HowItWorks() {
           </div>
         </div>
       </div>
+      </div>{/* end overflowX clip wrapper */}
     </>
   )
 }
