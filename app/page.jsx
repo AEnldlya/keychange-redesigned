@@ -184,7 +184,8 @@ function HeroSection() {
     <div ref={containerRef} style={{ height: '380vh', position: 'relative' }}>
       <div style={{
         position: 'sticky', top: 0, height: '100vh',
-        overflow: 'clip', background: 'var(--bg-dark)',
+        overflow: 'clip', clipPath: 'inset(0)',
+        background: 'var(--bg-dark)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
 
@@ -413,11 +414,11 @@ function HowItWorks() {
     { number: '04', title: 'Play',     desc: 'Instruments go directly into students hands, ready to make music.', icon: Play },
   ]
 
-  /* Each card slides in from right sequentially — 105% of own width, not 100vw, so it never causes page-level horizontal scroll */
-  const x0 = useTransform(scrollYProgress, [0,    0.25], ['105%', '0%'])
-  const x1 = useTransform(scrollYProgress, [0.15, 0.4 ], ['105%', '0%'])
-  const x2 = useTransform(scrollYProgress, [0.35, 0.6 ], ['105%', '0%'])
-  const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['105%', '0%'])
+  /* Each card slides in from right — fixed pixel offset so it never exceeds the clipped container */
+  const x0 = useTransform(scrollYProgress, [0,    0.25], [400, 0])
+  const x1 = useTransform(scrollYProgress, [0.15, 0.4 ], [400, 0])
+  const x2 = useTransform(scrollYProgress, [0.35, 0.6 ], [400, 0])
+  const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], [400, 0])
   const xs  = [x0, x1, x2, x3]
 
   const cardInner = (step) => (
@@ -466,7 +467,7 @@ function HowItWorks() {
       {/* Desktop: scroll-driven slide-in animation — outer wrapper clips any x-overflow so the page never scrolls horizontally */}
       <div style={{ overflowX: 'clip' }}>
       <div ref={containerRef} className="how-works-desktop" style={{ height: '300vh', background: 'var(--bg-dark)' }}>
-        <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'clip', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
+        <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'clip', clipPath: 'inset(0)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
           {sectionHeader}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
             {steps.map((step, i) => (
