@@ -57,7 +57,6 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p>&copy; {year} Key Change. All rights reserved.</p>
-          <p>A 501(c)(3) nonprofit organization</p>
         </div>
       </div>
     </footer>

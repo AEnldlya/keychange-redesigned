@@ -365,7 +365,8 @@ function StatsSection() {
       <div className="container">
         <motion.div
           ref={ref}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--sp-5)' }}
+          className="stats-grid"
+          style={{ display: 'grid', gap: 'var(--sp-5)' }}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
@@ -446,7 +447,7 @@ function HowItWorks() {
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
+        <div className="how-works-grid" style={{ display: 'grid', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
           {steps.map((step, i) => (
             <motion.div
               key={step.number}

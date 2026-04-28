@@ -248,6 +248,19 @@ button { cursor: pointer; border: none; background: none; }
 .ticker-dot { color: var(--blue); margin-left: var(--sp-6); }
 
 /* ════════════════════════════════════════════════
+   STATS GRID (home page)
+════════════════════════════════════════════════ */
+.stats-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } }
+
+/* ════════════════════════════════════════════════
+   HOW IT WORKS SCROLL GRID
+════════════════════════════════════════════════ */
+.how-works-grid { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 768px) { .how-works-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .how-works-grid { grid-template-columns: 1fr; } }
+
+/* ════════════════════════════════════════════════
    IMPACT
 ════════════════════════════════════════════════ */
 .impact-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--sp-16); align-items: center; }

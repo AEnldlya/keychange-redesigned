@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, CheckCircle, ArrowRight, Info } from 'lucide-react'
+import { Upload, CheckCircle, ArrowRight } from 'lucide-react'
 
 export default function DonatePage() {
   const [status, setStatus] = useState('idle')
@@ -338,20 +338,6 @@ export default function DonatePage() {
                     )}
                   </button>
 
-                  <p
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      marginTop: '1rem',
-                      fontSize: '0.875rem',
-                      color: 'var(--color-ink-muted)',
-                    }}
-                  >
-                    <Info size={16} />
-                    Your donation may be tax deductible. We are a registered
-                    501(c)(3) nonprofit.
-                  </p>
                 </form>
               )}
             </div>
