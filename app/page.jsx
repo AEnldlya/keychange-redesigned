@@ -412,11 +412,19 @@ function StatsSection() {
    Adapted from ContainerScroll + ProcessCard
 ══════════════════════════════════════════════ */
 function HowItWorks() {
+  const [isMobile, setIsMobile] = useState(false)
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   })
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const steps = [
     { number: '01', title: 'Collect',  desc: 'We receive instrument donations from community members, schools, and music stores.', icon: Music },
@@ -432,6 +440,49 @@ function HowItWorks() {
   const x3 = useTransform(scrollYProgress, [0.55, 0.8 ], ['100vw', '0vw'])
   const xs  = [x0, x1, x2, x3]
 
+  const cardStyle = {
+    padding: 'var(--sp-6)',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 'var(--radius-lg)',
+  }
+
+  const cardContent = (step) => (
+    <>
+      <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 400, color: 'var(--blue)', opacity: 0.3, display: 'block', marginBottom: 'var(--sp-3)', lineHeight: 1 }}>{step.number}</span>
+      <step.icon size={24} style={{ color: 'var(--blue)', marginBottom: 'var(--sp-4)' }} />
+      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 400, color: '#fff', marginBottom: 'var(--sp-3)' }}>{step.title}</h3>
+      <p style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>{step.desc}</p>
+    </>
+  )
+
+  /* Mobile: plain scrollable section, no pinned overflow */
+  if (isMobile) {
+    return (
+      <section style={{ background: 'var(--bg-dark)', padding: 'var(--sp-24) var(--sp-6)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--sp-12)' }}>
+          <span style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--blue)', marginBottom: 'var(--sp-3)' }}>The Process</span>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto' }}>
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              style={cardStyle}
+            >
+              {cardContent(step)}
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  /* Desktop: pinned scroll animation */
   return (
     <div ref={containerRef} style={{ height: '300vh', background: 'var(--bg-dark)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 var(--sp-6)' }}>
@@ -447,23 +498,13 @@ function HowItWorks() {
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#fff' }}>How it works</h2>
         </motion.div>
 
-        <div className="how-works-grid" style={{ display: 'grid', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-4)', maxWidth: 'var(--max)', margin: '0 auto', width: '100%' }}>
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
-              style={{
-                x: xs[i],
-                padding: 'var(--sp-8)',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 'var(--radius-lg)',
-                backdropFilter: 'blur(12px)',
-              }}
+              style={{ x: xs[i], ...cardStyle, padding: 'var(--sp-8)', backdropFilter: 'blur(12px)' }}
             >
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 400, color: 'var(--blue)', opacity: 0.3, display: 'block', marginBottom: 'var(--sp-3)', lineHeight: 1 }}>{step.number}</span>
-              <step.icon size={24} style={{ color: 'var(--blue)', marginBottom: 'var(--sp-4)' }} />
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 400, color: '#fff', marginBottom: 'var(--sp-3)' }}>{step.title}</h3>
-              <p style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}>{step.desc}</p>
+              {cardContent(step)}
             </motion.div>
           ))}
         </div>
