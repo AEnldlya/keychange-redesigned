@@ -126,7 +126,7 @@ function HeroSection() {
       /* ── Video box: scale + borderRadius + overlay ── */
       if (videoBoxRef.current) {
         const s = lerp(0.22, 1,    inv(p, 0.16, 0.52))
-        const r = lerp(18,   0,    inv(p, 0.16, 0.52))
+        const r = lerp(8,    0,    inv(p, 0.16, 0.52))
         videoBoxRef.current.style.transform    = `scale(${s})`
         videoBoxRef.current.style.borderRadius = `${r}px`
       }
@@ -182,7 +182,7 @@ function HeroSection() {
   const tile = (pos) => ({
     position: 'absolute', ...pos,
     width: '24%', height: '43%',
-    borderRadius: 14, overflow: 'hidden',
+    borderRadius: 6, overflow: 'hidden',
     willChange: 'transform, opacity', zIndex: 5,
   })
 
@@ -216,7 +216,7 @@ function HeroSection() {
           ref={videoBoxRef}
           style={{
             position: 'absolute', inset: 0,
-            transform: 'scale(0.22)', borderRadius: 18,
+            transform: 'scale(0.22)', borderRadius: 8,
             overflow: 'hidden', transformOrigin: 'center',
             willChange: 'transform, border-radius', zIndex: 3,
           }}
