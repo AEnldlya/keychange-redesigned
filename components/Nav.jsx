@@ -85,22 +85,11 @@ export default function Nav() {
             </motion.div>
           ))}
 
-          {/* Donate button — hidden when ghost, shows when scrolled */}
-          <AnimatePresence>
-            {!ghost && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Link href="/donate" className="btn btn-blue"
-                  style={{ padding: '0.45rem 1.1rem', fontSize: '0.8375rem' }}>
-                  Donate
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Donate button — always visible, even on the ghost hero */}
+          <Link href="/donate" className="btn btn-blue"
+            style={{ padding: '0.45rem 1.1rem', fontSize: '0.8375rem' }}>
+            Donate
+          </Link>
         </div>
 
         <button
