@@ -4,27 +4,26 @@ import { createAirtableRecord, AIRTABLE_TABLES } from '@/lib/airtableSubmit'
 import {
   airtableFieldNames,
   conditionSelectLabel,
-  canDropOffSelectLabel,
+  donationTypeSelectLabel,
 } from '@/lib/airtableFieldNames'
 import { nextJsonFromAirtableResponse } from '@/lib/airtableHttpError'
 
 export async function POST(req) {
   try {
     const {
+      donation_type,
       first_name,
       last_name,
-      organization,
       email,
-      newsletter,
       phone,
-      city,
-      state,
-      donation_description,
+      date,
+      ok_to_contact,
+      newsletter,
+      drive_organization,
+      drive_date,
+      drive_offer,
+      instrument_type,
       condition,
-      can_dropoff,
-      alt_location,
-      dropoff_time,
-      other_info,
       image_base64,
       image_filename,
     } = await req.json()
@@ -57,28 +56,24 @@ export async function POST(req) {
     }
 
     const { submittedAt } = airtableFieldNames()
+    const donationTypeLabel = donationTypeSelectLabel(donation_type)
     const conditionLabel = conditionSelectLabel(condition)
-    const dropOffLabel = canDropOffSelectLabel(can_dropoff)
 
     const fields = {
+      'Donation Type': donationTypeLabel,
       'First Name': first_name,
       'Last Name': last_name,
       Email: email,
-      Newsletter: Boolean(newsletter),
       Phone: phone || '',
-      Organization: organization || '',
-      City: city || '',
-      State: state || '',
-      'Donation Description': donation_description || '',
+      Date: date || '',
+      'OK to Contact': Boolean(ok_to_contact),
+      Newsletter: Boolean(newsletter),
+      'Drive Organization': drive_organization || '',
+      'Drive Date': drive_date || '',
+      'Drive Offer': drive_offer || '',
+      'Instrument Type': instrument_type || '',
       Condition: conditionLabel,
-      'Alt Location': alt_location || '',
-      'Drop-off Time': dropoff_time || '',
-      'Other Info': other_info || '',
       [submittedAt]: new Date().toISOString(),
-    }
-
-    if (dropOffLabel) {
-      fields['Can Drop Off'] = dropOffLabel
     }
 
     if (instrumentPhotoUrl) {

@@ -66,7 +66,7 @@ export default function Nav() {
         </Link>
 
         <div className="nav-links">
-          {links.map((l) => (
+          {links.filter((l) => l.href !== '/donate').map((l) => (
             <motion.div key={l.href} whileHover={{ y: -1 }} transition={{ duration: 0.12 }}>
               <Link
                 href={l.href}
