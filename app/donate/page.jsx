@@ -256,6 +256,16 @@ export default function DonatePage() {
                         Instrument Details
                       </h3>
 
+                      <img
+                        src="/assets/donated-instruments.jpg"
+                        alt="Instruments and cases collected from a past Key Change donation drive"
+                        style={{
+                          width: '100%',
+                          borderRadius: 'var(--radius-lg)',
+                          marginBottom: 'var(--sp-5)',
+                        }}
+                      />
+
                       <div className="form-group">
                         <label className="form-label">
                           Type of Instrument <span>(required)</span>
