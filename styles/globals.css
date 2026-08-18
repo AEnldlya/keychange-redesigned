@@ -435,6 +435,35 @@ button { cursor: pointer; border: none; background: none; }
 
 .form-hint { display: block; margin-top: var(--sp-2); font-size: 0.8125rem; color: var(--ink-3); line-height: 1.5; }
 
+/* Donation type selector */
+.donation-type-group {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3);
+  margin-bottom: var(--sp-8);
+}
+@media (max-width: 580px) { .donation-type-group { grid-template-columns: 1fr; } }
+.donation-type-option {
+  display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-4); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); cursor: pointer;
+  transition: all var(--fast);
+  background: var(--white);
+}
+.donation-type-option:hover { border-color: var(--blue); }
+.donation-type-option input { position: absolute; opacity: 0; pointer-events: none; }
+.donation-type-option.active { border-color: var(--blue); background: var(--blue-light); box-shadow: 0 0 0 1px var(--blue); }
+.donation-type-option strong { font-size: 0.9375rem; color: var(--ink); }
+.donation-type-option span { font-size: 0.8125rem; color: var(--ink-3); line-height: 1.4; }
+
+/* Info callout (e.g. external donation link) */
+.form-callout {
+  background: var(--blue-light); border: 1px solid rgba(43,92,230,0.2);
+  border-radius: var(--radius-lg); padding: var(--sp-6);
+  margin-bottom: var(--sp-5);
+}
+.form-callout p { font-size: 0.9375rem; color: var(--ink-2); line-height: 1.6; margin-bottom: var(--sp-4); }
+.form-callout p:last-child { margin-bottom: 0; }
+.form-callout .btn { display: inline-flex; }
+
 .form-submit {
   display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
   width: 100%; padding: var(--sp-4) var(--sp-8);

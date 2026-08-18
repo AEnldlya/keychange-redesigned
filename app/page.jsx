@@ -290,7 +290,7 @@ function HeroSection() {
           </motion.div>
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={spring}>
             <Link href="/donate" className="btn btn-ghost">
-              Donate an Instrument
+              Donate
             </Link>
           </motion.div>
         </div>
