@@ -74,14 +74,13 @@ export default function AboutPage() {
 
           <motion.div
             ref={foundersRef}
-            className="founders-grid founders-grid-4"
+            className="founders-grid founders-grid-3"
             variants={containerVariants}
             initial="hidden"
             animate={foundersInView ? 'visible' : 'hidden'}
           >
             {[
               { name: 'Andy Zhang',  instrument: 'Alto Saxophone' },
-              { name: 'Alex Chen',   instrument: 'Tenor Saxophone' },
               { name: 'Jason',       instrument: 'Flute' },
               { name: 'Ansh',        instrument: 'Flute' },
             ].map((f) => (

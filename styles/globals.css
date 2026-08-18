@@ -544,8 +544,10 @@ button { cursor: pointer; border: none; background: none; }
 .founder-bio { font-size: 0.9375rem; line-height: 1.65; color: var(--ink-2); }
 .founder-instrument { font-size: 0.875rem; font-weight: 500; color: var(--blue); margin-bottom: var(--sp-1); }
 .founders-grid-4 { grid-template-columns: repeat(4, 1fr); max-width: 100%; }
+.founders-grid-3 { grid-template-columns: repeat(3, 1fr); max-width: 900px; }
 @media (max-width: 900px) { .founders-grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .founders-grid { grid-template-columns: 1fr; } .founders-grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .founders-grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .founders-grid { grid-template-columns: 1fr; } .founders-grid-4 { grid-template-columns: repeat(2, 1fr); } .founders-grid-3 { grid-template-columns: 1fr; } }
 .values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); }
 .value-card { background: var(--white); border-radius: var(--radius-lg); padding: var(--sp-8); border: 1px solid var(--border); height: 100%; transition: transform var(--base), box-shadow var(--base); }
 .value-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
