@@ -4,7 +4,7 @@ import { createAirtableRecord, AIRTABLE_TABLES } from '@/lib/airtableSubmit'
 import {
   airtableFieldNames,
   conditionSelectLabel,
-  donationTypeSelectLabel,
+  donationTypeLabel,
 } from '@/lib/airtableFieldNames'
 import { nextJsonFromAirtableResponse } from '@/lib/airtableHttpError'
 
@@ -16,7 +16,6 @@ export async function POST(req) {
       last_name,
       email,
       phone,
-      date,
       ok_to_contact,
       newsletter,
       drive_organization,
@@ -56,23 +55,33 @@ export async function POST(req) {
     }
 
     const { submittedAt } = airtableFieldNames()
-    const donationTypeLabel = donationTypeSelectLabel(donation_type)
-    const conditionLabel = conditionSelectLabel(condition)
+    const typeLabel = donationTypeLabel(donation_type)
+    const conditionLabel = donation_type === 'instrument' ? conditionSelectLabel(condition) : ''
+
+    // Everything below maps onto the Donations table's pre-existing columns
+    // only, so this never 422s on a field the base doesn't have.
+    const donationDescription =
+      donation_type === 'drive'
+        ? `[${typeLabel}] Willing to give: ${drive_offer || ''}`
+        : `[${typeLabel}] ${instrument_type || ''}`
+
+    const otherInfo = [
+      donation_type === 'drive' && drive_date ? `Date of drive: ${drive_date}` : null,
+      `OK to contact: ${ok_to_contact ? 'Yes' : 'No'}`,
+    ]
+      .filter(Boolean)
+      .join(' · ')
 
     const fields = {
-      'Donation Type': donationTypeLabel,
       'First Name': first_name,
       'Last Name': last_name,
       Email: email,
       Phone: phone || '',
-      Date: date || '',
-      'OK to Contact': Boolean(ok_to_contact),
       Newsletter: Boolean(newsletter),
-      'Drive Organization': drive_organization || '',
-      'Drive Date': drive_date || '',
-      'Drive Offer': drive_offer || '',
-      'Instrument Type': instrument_type || '',
+      Organization: drive_organization || '',
+      'Donation Description': donationDescription,
       Condition: conditionLabel,
+      'Other Info': otherInfo,
       [submittedAt]: new Date().toISOString(),
     }
 

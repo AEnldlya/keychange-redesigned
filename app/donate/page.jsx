@@ -61,7 +61,6 @@ export default function DonatePage() {
       last_name: fd.get('last_name'),
       email: fd.get('email'),
       phone: fd.get('phone'),
-      date: fd.get('date'),
       ok_to_contact: fd.get('ok_to_contact') === 'yes',
       newsletter: fd.get('newsletter') === 'yes',
       // Drive donation
@@ -80,7 +79,6 @@ export default function DonatePage() {
     if (!data.last_name) newErrors.last_name = 'Required'
     if (!data.email) newErrors.email = 'Required'
     if (!data.phone) newErrors.phone = 'Required'
-    if (!data.date) newErrors.date = 'Required'
     if (!data.ok_to_contact) newErrors.ok_to_contact = 'Required'
 
     if (donationType === 'drive') {
@@ -173,6 +171,29 @@ export default function DonatePage() {
                     ))}
                   </div>
 
+                  {/* Money Donation — handled entirely via Fractured Atlas, no form */}
+                  {donationType === 'money' && (
+                    <>
+                      <h3 className="form-section-heading">Give Directly</h3>
+                      <div className="form-callout">
+                        <p>
+                          Monetary donations are collected securely through
+                          our Fractured Atlas fundraising page. Click below
+                          to give — no need to fill out anything here.
+                        </p>
+                        <a
+                          href={ATLAS_DONATE_URL}
+                          target="_blank"
+                          rel="noopener"
+                          className="btn btn-blue"
+                        >
+                          Donate on Fractured Atlas
+                          <ExternalLink size={16} />
+                        </a>
+                      </div>
+                    </>
+                  )}
+
                   {/* Drive Donation fields */}
                   {donationType === 'drive' && (
                     <>
@@ -221,30 +242,6 @@ export default function DonatePage() {
                         {errors.drive_offer && (
                           <span className="form-error">{errors.drive_offer}</span>
                         )}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Money Donation */}
-                  {donationType === 'money' && (
-                    <>
-                      <h3 className="form-section-heading">Give Directly</h3>
-                      <div className="form-callout">
-                        <p>
-                          Monetary donations are collected securely through
-                          our Fractured Atlas fundraising page. Click below to
-                          give, then fill out your information so we can
-                          follow up and say thank you.
-                        </p>
-                        <a
-                          href={ATLAS_DONATE_URL}
-                          target="_blank"
-                          rel="noopener"
-                          className="btn btn-blue"
-                        >
-                          Donate on Fractured Atlas
-                          <ExternalLink size={16} />
-                        </a>
                       </div>
                     </>
                   )}
@@ -350,124 +347,113 @@ export default function DonatePage() {
                     </>
                   )}
 
-                  {/* Contact Info */}
-                  <h3 className="form-section-heading">Your Information</h3>
+                  {/* Contact Info — not needed for Money Donation, that's handled via Fractured Atlas */}
+                  {donationType !== 'money' && (
+                    <>
+                      <h3 className="form-section-heading">Your Information</h3>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">
-                        First Name <span>(required)</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="first_name"
-                        className={`form-input ${errors.first_name ? 'error' : ''}`}
-                      />
-                      {errors.first_name && (
-                        <span className="form-error">{errors.first_name}</span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">
-                        Last Name <span>(required)</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="last_name"
-                        className={`form-input ${errors.last_name ? 'error' : ''}`}
-                      />
-                      {errors.last_name && (
-                        <span className="form-error">{errors.last_name}</span>
-                      )}
-                    </div>
-                  </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label className="form-label">
+                            First Name <span>(required)</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="first_name"
+                            className={`form-input ${errors.first_name ? 'error' : ''}`}
+                          />
+                          {errors.first_name && (
+                            <span className="form-error">{errors.first_name}</span>
+                          )}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">
+                            Last Name <span>(required)</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="last_name"
+                            className={`form-input ${errors.last_name ? 'error' : ''}`}
+                          />
+                          {errors.last_name && (
+                            <span className="form-error">{errors.last_name}</span>
+                          )}
+                        </div>
+                      </div>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">
-                        Phone Number <span>(required)</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        className={`form-input ${errors.phone ? 'error' : ''}`}
-                      />
-                      {errors.phone && (
-                        <span className="form-error">{errors.phone}</span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">
-                        Email <span>(required)</span>
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        className={`form-input ${errors.email ? 'error' : ''}`}
-                      />
-                      {errors.email && (
-                        <span className="form-error">{errors.email}</span>
-                      )}
-                    </div>
-                  </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label className="form-label">
+                            Phone Number <span>(required)</span>
+                          </label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            className={`form-input ${errors.phone ? 'error' : ''}`}
+                          />
+                          {errors.phone && (
+                            <span className="form-error">{errors.phone}</span>
+                          )}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">
+                            Email <span>(required)</span>
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            className={`form-input ${errors.email ? 'error' : ''}`}
+                          />
+                          {errors.email && (
+                            <span className="form-error">{errors.email}</span>
+                          )}
+                        </div>
+                      </div>
 
-                  <div className="form-group">
-                    <label className="form-label">
-                      Date <span>(required)</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="date"
-                      className={`form-input ${errors.date ? 'error' : ''}`}
-                    />
-                    {errors.date && (
-                      <span className="form-error">{errors.date}</span>
-                    )}
-                  </div>
+                      <label className="form-checkbox">
+                        <input type="checkbox" name="ok_to_contact" value="yes" />
+                        <span>
+                          Yes, Key Change can contact me about this donation{' '}
+                          <span style={{ color: 'var(--error)' }}>(required)</span>
+                        </span>
+                      </label>
+                      {errors.ok_to_contact && (
+                        <span className="form-error" style={{ marginTop: '-0.75rem', marginBottom: '1rem' }}>
+                          {errors.ok_to_contact}
+                        </span>
+                      )}
 
-                  <label className="form-checkbox">
-                    <input type="checkbox" name="ok_to_contact" value="yes" />
-                    <span>
-                      Yes, Key Change can contact me about this donation{' '}
-                      <span style={{ color: 'var(--error)' }}>(required)</span>
-                    </span>
-                  </label>
-                  {errors.ok_to_contact && (
-                    <span className="form-error" style={{ marginTop: '-0.75rem', marginBottom: '1rem' }}>
-                      {errors.ok_to_contact}
-                    </span>
+                      <label className="form-checkbox">
+                        <input type="checkbox" name="newsletter" value="yes" />
+                        <span>Keep me updated on Key Change news</span>
+                      </label>
+
+                      {status === 'error' && (
+                        <div
+                          className="form-error"
+                          style={{ marginBottom: '1rem' }}
+                        >
+                          {submitError || 'Something went wrong. Please try again.'}
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        className="btn btn-blue"
+                        style={{ width: '100%' }}
+                        disabled={status === 'submitting'}
+                      >
+                        {status === 'submitting' ? (
+                          'Submitting...'
+                        ) : (
+                          <>
+                            Submit Donation
+                            <ArrowRight size={18} />
+                          </>
+                        )}
+                      </button>
+                    </>
                   )}
-
-                  <label className="form-checkbox">
-                    <input type="checkbox" name="newsletter" value="yes" />
-                    <span>Keep me updated on Key Change news</span>
-                  </label>
-
-                  {status === 'error' && (
-                    <div
-                      className="form-error"
-                      style={{ marginBottom: '1rem' }}
-                    >
-                      {submitError || 'Something went wrong. Please try again.'}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="btn btn-blue"
-                    style={{ width: '100%' }}
-                    disabled={status === 'submitting'}
-                  >
-                    {status === 'submitting' ? (
-                      'Submitting...'
-                    ) : (
-                      <>
-                        Submit Donation
-                        <ArrowRight size={18} />
-                      </>
-                    )}
-                  </button>
-
                 </form>
               )}
             </div>
