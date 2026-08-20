@@ -199,6 +199,16 @@ export default function DonatePage() {
                     <>
                       <h3 className="form-section-heading">Drive Details</h3>
 
+                      <img
+                        src="/assets/drive-donation-cases.jpg"
+                        alt="Instruments collected from a past Key Change donation drive"
+                        style={{
+                          width: '100%',
+                          borderRadius: 'var(--radius-lg)',
+                          marginBottom: 'var(--sp-5)',
+                        }}
+                      />
+
                       <div className="form-group">
                         <label className="form-label">
                           Organization Name <span>(required)</span>
